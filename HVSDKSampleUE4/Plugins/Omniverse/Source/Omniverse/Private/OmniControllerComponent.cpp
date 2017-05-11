@@ -70,13 +70,10 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 				CurrYaw = cameraYaw * CouplingPercentage + (OmniYaw + StartYawDiff) * (1.0f - CouplingPercentage);
 
 				// Set ACharacter Yaw
-				FRotator actor_rot = pawn->GetActorRotation();
-				if (FMath::Abs(actor_rot.Yaw - CurrYaw) > 3) 
-				{
-					APlayerController *pc = CastChecked<APlayerController>(controller);
-					pc->SetControlRotation(FRotator(pc->RotationInput.Pitch, CurrYaw, pc->RotationInput.Roll));
-					Camera->GetAttachParent()->SetRelativeRotation(FQuat(FRotator(0, -CurrYaw, 0)));
-				}
+				APlayerController *pc = CastChecked<APlayerController>(controller);
+				pc->SetControlRotation(FRotator(pc->RotationInput.Pitch, CurrYaw, pc->RotationInput.Roll));
+
+				Camera->GetAttachParent()->SetRelativeRotation(FQuat(FRotator(0, -pawn->GetActorRotation().Yaw + StartYawDiff, 0)));
 			}
 		}
 	}	
