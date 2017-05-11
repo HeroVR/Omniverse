@@ -12,54 +12,50 @@ AHVRayActor::AHVRayActor()
 #if UE_VERSION_GE(4, 13)
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultComponent"));
 
-	struct FConstructorStatics
-	{
-		ConstructorHelpers::FObjectFinderOptional<UMaterial> LineMaterial;
-		FConstructorStatics()
-			: LineMaterial(TEXT("/Omniverse/HvSDK/LineMaterial.LineMaterial"))
-		{
-		}
-	};
-	static FConstructorStatics ConstructorStatics;
-
-	//left controller
-	MotionController_Left = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController_Left"));
-	MotionController_Left->SetupAttachment(GetRootComponent());
-	MotionController_Left->Hand = EControllerHand::Left;
-
-	//right controller
-	MotionController_Right = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController_Right"));
-	MotionController_Right->SetupAttachment(GetRootComponent());
-	MotionController_Right->Hand = EControllerHand::Right;
-
-	//interaction
-	WidgetInteraction = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("WidgetInteraction"));
-	WidgetInteraction->InteractionDistance = 2000;
-	WidgetInteraction->SetRelativeRotation(FRotator(-60.0f, 0.0f, 0.0f));
-
-	WidgetInteraction->bShowDebug = true;
-	WidgetInteraction->DebugColor = FLinearColor::Green;
-	WidgetInteraction->InteractionSource = !HasAnyFlags(RF_ClassDefaultObject) && UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled() ? EWidgetInteractionSource::Custom : EWidgetInteractionSource::Mouse;
-	WidgetInteraction->SetupAttachment(UHvInterface::RayHandIndex ? MotionController_Right : MotionController_Left);
-
-	//left ray
-	CustomMesh = CreateDefaultSubobject<UCustomMeshComponent>(TEXT("CustemMesh"));
-	CustomMesh->SetMaterial(0, ConstructorStatics.LineMaterial.Get());
-	CustomMesh->SetupAttachment(WidgetInteraction);
-	CustomMesh->SetTranslucentSortPriority(255);
-	
 	PrimaryActorTick.bCanEverTick = true;
 	bVisible = false;
+
+	static ConstructorHelpers::FObjectFinderOptional<UMaterial> material(TEXT("/Omniverse/HvSDK/LineMaterial.LineMaterial"));
+	if (!HasAnyFlags(RF_ClassDefaultObject))
+	{
+		//left controller
+		MotionController_Left = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController_Left"));
+		MotionController_Left->SetupAttachment(GetRootComponent());
+		MotionController_Left->Hand = EControllerHand::Left;
+
+		//right controller
+		MotionController_Right = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController_Right"));
+		MotionController_Right->SetupAttachment(GetRootComponent());
+		MotionController_Right->Hand = EControllerHand::Right;
+
+		//interaction
+		WidgetInteraction = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("WidgetInteraction"));
+		WidgetInteraction->InteractionDistance = 2000;
+		WidgetInteraction->SetRelativeRotation(FRotator(-60.0f, 0.0f, 0.0f));
+
+		WidgetInteraction->bShowDebug = true;
+		WidgetInteraction->DebugColor = FLinearColor::Green;
+		WidgetInteraction->InteractionSource = !HasAnyFlags(RF_ClassDefaultObject) && UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled() ? EWidgetInteractionSource::Custom : EWidgetInteractionSource::Mouse;
+		WidgetInteraction->bEnableHitTesting = bVisible;
+		WidgetInteraction->SetupAttachment(UHvInterface::RayHandIndex ? MotionController_Right : MotionController_Left);
+
+		//left ray
+		CustomMesh = CreateDefaultSubobject<UCustomMeshComponent>(TEXT("CustemMesh"));
+		CustomMesh->SetMaterial(0, material.Get());
+		CustomMesh->SetupAttachment(WidgetInteraction);
+		CustomMesh->SetTranslucentSortPriority(255);
+	}
+
 #endif
 	//AutoReceiveInput = EAutoReceiveInput::Player0;
 }
 
 AHVRayActor::~AHVRayActor()
 {
-	UHvInterface::OnHvActorDestroyed();
+	UHvInterface::OnRayActorDestroyed();
 }
 
-#define LINE_WEIGHT 2.0f
+#define LINE_WEIGHT 1.5f
 
 void AHVRayActor::DrawLine(UCustomMeshComponent *CustoemMesh, float Distance, bool ShowHit)
 {
@@ -261,7 +257,7 @@ void AHVRayActor::CheckVisible()
 	if (UHvInterface::GetInstance()->RayVisibility == ERayVisibility::AlwaysShow) {
 		vis = true;
 	}
-	else if (UHvInterface::GetInstance()->RayVisibility == ERayVisibility::NoSpec) {
+	else if (UHvInterface::GetInstance()->RayVisibility == ERayVisibility::Auto) {
 		vis = UHvInterface::GetDlgNum() > 0;
 	}
 
@@ -271,6 +267,7 @@ void AHVRayActor::CheckVisible()
 			CustomMesh->ClearCustomMeshTriangles();
 		}
 		bVisible = vis;
+		WidgetInteraction->bEnableHitTesting = vis;
 	}
 }
 

@@ -14,7 +14,7 @@ UENUM(BlueprintType)
 namespace ERayVisibility
 {
 	enum Type {
-		NoSpec,
+		Auto,
 		AlwaysShow,
 		AlwaysHide,
 	};
@@ -70,6 +70,7 @@ class OMNIVERSE_API UHvInterface : public UBlueprintFunctionLibrary, public FTic
 {
 	GENERATED_UCLASS_BODY()
 	friend class AHVRayActor;
+	friend class AHVDlgBase;
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Init", Keywords = "Init"), Category = "HVSDK")
 	static void init(int nGameId, FString sGameKey, FString sParam);
@@ -183,13 +184,10 @@ public:
 
 	void RegisterBuyCallBack(HVBUY_CALLBACK BuyCallBack);
 
-	static void BeginPlayDlgBase(AHVDlgBase *Dlg);
-	static void EndPlayDlgBase(AHVDlgBase *Dlg);
 	static int GetDlgNum() {
 		return DlgList.Num();
 	}
 
-	static void OnHvActorDestroyed();
 	static UWorld* GetGameWorld();
 private:
 	static UHvInterface *Instance;
@@ -203,8 +201,12 @@ private:
 
 	//UPROPERTY()
 	static TArray<AHVDlgBase*> DlgList;
+	static void BeginPlayDlgBase(AHVDlgBase *Dlg);
+	static void EndPlayDlgBase(AHVDlgBase *Dlg);
+
 	static AHVRayActor *RayActor;
 	static int RayHandIndex;
+	static void OnRayActorDestroyed();
 
 	static void BeginPlay();
 	static void EndPlay();

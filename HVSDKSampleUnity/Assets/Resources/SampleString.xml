@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<r id="WaitInit" str="Init HVSDK. Please standby..."/>
+	<r id="PrepareStage" str="PrepareStage"/>
+	<r id="PrepareConfirm" str="It's prepare time. When prepare time over, or close this window, billing time begins."/>
+	<r id="PrepareEnd" str="Now billing time begins!"/>
+	<r id="InitResult" str="Init Result"/>
+</root>

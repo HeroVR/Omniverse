@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Runtime/Core/Public/Core.h"
-#include <map>
 #include "HVStringRes.generated.h"
 
-typedef std::map<FString, FString> StringResMap;
+typedef TMap<FString, FString> TStringResMap;
 
 UCLASS()
 class OMNIVERSE_API UHVStringRes : public UBlueprintFunctionLibrary
@@ -12,12 +11,12 @@ class OMNIVERSE_API UHVStringRes : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "LoadString", Keywords = "LoadString"), Category = "HVSDK")
-	static void LoadString(FString PathName = "");
+	static void LoadString(FString pathName = "");
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetString", Keywords = "GetString"), Category = "HVSDK")
-	static FString GetString(const FString szID);
+	static FString GetString(const FString id);
 private:
-	static StringResMap _StringResMap;
+	static TStringResMap StringResMap;
 };
 
 #define HVSTRING(x) FText::FromString(UHVStringRes::GetString(x))

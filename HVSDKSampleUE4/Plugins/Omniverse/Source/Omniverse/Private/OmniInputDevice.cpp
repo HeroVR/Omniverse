@@ -112,18 +112,6 @@ void FOmniInputDevice::Tick(float DeltaTime)
 
 void FOmniInputDevice::SendControllerEvents()
 {
-#if UE_EDITOR
-	if (!bInitializationSucceeded) 
-	{
-		RetryInitTimer += 0.02f;
-		if (RetryInitTimer > 10.0f) 
-		{
-			RetryInitTimer = 0;
-			Init();
-		}
-	}
-#endif
-
 	if (!bInitializationSucceeded) return;
 
 	omni_motion_t Omni_Internal_Motion;

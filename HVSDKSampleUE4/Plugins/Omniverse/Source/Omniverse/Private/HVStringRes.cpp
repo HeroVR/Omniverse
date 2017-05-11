@@ -1,86 +1,67 @@
 #include "OmniversePrivatePCH.h"
 #include "HVStringRes.h"
 #include <Runtime/XmlParser/Public/XmlFile.h>
-//#include <Windows.h>
 
 #ifdef LoadString
 #undef LoadString
 #endif
 
-StringResMap UHVStringRes::_StringResMap;
-/*
-static FString GetOSLanguage()
+TStringResMap UHVStringRes::StringResMap;
+
+static FString GetResFile(FString pathName)
 {
-	FString OSLanguage;
-
-	LCID DefaultLocale = GetUserDefaultUILanguage();
-
-	const int32 MaxLocaleStringLength = 9;
-	TCHAR LangBuffer[MaxLocaleStringLength];
-	int LangReturn = GetLocaleInfo(DefaultLocale, LOCALE_SISO639LANGNAME, LangBuffer, ARRAY_COUNT(LangBuffer));
-	TCHAR CountryBuffer[MaxLocaleStringLength];
-	int CountryReturn = GetLocaleInfo(DefaultLocale, LOCALE_SISO3166CTRYNAME, CountryBuffer, ARRAY_COUNT(CountryBuffer));
-	
-	if (LangReturn != 0 && CountryReturn != 0) {
-		OSLanguage = FString::Printf(TEXT("%s-%s"), LangBuffer, CountryBuffer);
-	}
-
-	return OSLanguage;
-}
-*/
-
-static FString GetResFile(FString PathName)
-{
-	FString OSLanguage = funcGetSysLang(); //GetOSLanguage();
-	if (!OSLanguage.IsEmpty()) {
-		OSLanguage = "_" + OSLanguage;
-	}
-
-	FString ResFile = FPaths::GamePluginsDir() + "/Omniverse/Content/HvSDK/stringres" + OSLanguage + ".xml";
-	if (!PathName.IsEmpty())
-		ResFile = FPaths::GameDir() + "/Content/HvSDK/" + PathName + "/stringres" + OSLanguage + ".xml";
-
-	if (!FPlatformFileManager::Get().GetPlatformFile().FileExists(*ResFile)) {
-		OSLanguage.Empty();
-	}
-
-	ResFile = FPaths::GamePluginsDir() + "/Omniverse/Content/HvSDK/stringres" + OSLanguage + ".xml";
-	if (!PathName.IsEmpty())
-		ResFile = FPaths::GameDir() + "/Content/HvSDK/" + PathName + "/stringres" + OSLanguage + ".xml";
-
-	return ResFile;
-}
-
-void UHVStringRes::LoadString(FString PathName)
-{
-	FString ResFile = GetResFile(PathName);
-
-	FXmlFile* XmlFile = new FXmlFile(ResFile);
-	if (XmlFile)
+	FString res_file;
+	FString os_lang = funcGetSysLang(); //GetOSLanguage();
+	if (!os_lang.IsEmpty()) 
 	{
-		FXmlNode* RootNode = XmlFile->GetRootNode();
-		if (RootNode)
+		os_lang = "_" + os_lang;
+		res_file = pathName.IsEmpty()
+			? FPaths::GamePluginsDir() + "Omniverse/Content/HvSDK/stringres" + os_lang + ".xml"
+			: FPaths::GameDir() + "Content/" + pathName + "/stringres" + os_lang + ".xml";
+
+		if (FPlatformFileManager::Get().GetPlatformFile().FileExists(*res_file)) {
+			return res_file;
+		}
+	}
+
+	res_file = pathName.IsEmpty()
+		? FPaths::GamePluginsDir() + "Omniverse/Content/HvSDK/stringres.xml"
+		: FPaths::GameDir() + "Content/" + pathName + "/stringres.xml";
+
+	return res_file;
+}
+
+void UHVStringRes::LoadString(FString pathName)
+{
+	FString res_file = GetResFile(pathName);
+
+	FXmlFile* xml_file = new FXmlFile(res_file);
+	if (xml_file)
+	{
+		FXmlNode* root_node = xml_file->GetRootNode();
+		if (root_node)
 		{
-			const TArray<FXmlNode*> AssetNodes = RootNode->GetChildrenNodes();
-			for (int i = 0; i < AssetNodes.Num(); i++)
+			const TArray<FXmlNode*> asset_nodes = root_node->GetChildrenNodes();
+			for (int i = 0; i < asset_nodes.Num(); i++)
 			{
-				FString sKey = AssetNodes[i]->GetAttribute("id");
-				sKey = sKey.Replace(TEXT("\\n"), TEXT("\n"));
+				FString key = asset_nodes[i]->GetAttribute("id");
+				key = key.Replace(TEXT("\\n"), TEXT("\n"));
 
-				FString sValue = AssetNodes[i]->GetAttribute("str");
-				sValue = sValue.Replace(TEXT("\\n"), TEXT("\n"));
+				FString value = asset_nodes[i]->GetAttribute("str");
+				value = value.Replace(TEXT("\\n"), TEXT("\n"));
 
-				_StringResMap[sKey] = *sValue;
+				StringResMap.Add(key) = *value;
 			}
 		}
 	}
 }
 
-FString UHVStringRes::GetString(const FString szID)
+FString UHVStringRes::GetString(const FString id)
 {
-	StringResMap::iterator i = _StringResMap.find(szID);
-	if (i == _StringResMap.end())
-		return szID;
+	FString *i = StringResMap.Find(id);
+	if (i == nullptr) {
+		return id;
+	}
 
-	return i->second;
+	return *i;
 }

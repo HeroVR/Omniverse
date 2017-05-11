@@ -36,7 +36,6 @@ public:
 	} OmniU;
 
 	bool bInitializationSucceeded = false;
-	float RetryInitTimer = 0;
 
 	omni_motion_t *m_OmniMotion;
 	uint8 OmniInputBuffer[65] = { 0 };

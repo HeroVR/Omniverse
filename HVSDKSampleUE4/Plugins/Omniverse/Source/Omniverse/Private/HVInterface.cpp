@@ -74,7 +74,7 @@ UHvInterface::UHvInterface(const FObjectInitializer &objIniter)
 {
 	UmgDistance = 150;
 
-	RayVisibility = ERayVisibility::NoSpec;
+	RayVisibility = ERayVisibility::Auto;
 
 	bDisableMenuBox = false;
 	bDisableResumeGame = false;
@@ -82,10 +82,10 @@ UHvInterface::UHvInterface(const FObjectInitializer &objIniter)
 
 void UHvInterface::init(int nGameId, FString sGameKey, FString sParam)
 {
-#if UE_EDITOR
-	if (hasInit())
-		return;
-#endif
+//#if UE_EDITOR
+//	if (hasInit())
+//		return;
+//#endif
 
 	UE_LOG(LogTemp, Display, TEXT("Omniverse init begin..."));
 
@@ -202,6 +202,11 @@ void UHvInterface::RegisterBuyCallBack(HVBUY_CALLBACK buyCallBack) {
 
 void UHvInterface::buy(FString sItem, float nPrice, FString sOutTradeNo)
 {
+	if (isGuest() || getUserId() == 0) {
+		MsgBox(HVSTRING("Notice"), HVSTRING("BuyGuest"), nullptr, EMsgBoxFlag::Ok);
+		return;
+	}
+
 	BuyParam.sItem = sItem;
 	BuyParam.nPrice = nPrice;
 	BuyParam.sOutTradeNo = sOutTradeNo;
@@ -312,7 +317,7 @@ void UHvInterface::EndPlayDlgBase(AHVDlgBase *Dlg)
 	}
 }
 
-void UHvInterface::OnHvActorDestroyed()
+void UHvInterface::OnRayActorDestroyed()
 {
 	RayActor = nullptr;
 }

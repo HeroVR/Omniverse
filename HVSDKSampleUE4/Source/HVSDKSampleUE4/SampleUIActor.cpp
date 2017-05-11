@@ -4,6 +4,7 @@
 #include "SampleUIActor.h"
 #include "Button.h"
 #include "HVInterface.h"
+#include "HVStringRes.h"
 #include <time.h>
 
 // Sets default values
@@ -54,5 +55,5 @@ void ASampleUIActor::OnClickButtonPurchase() {
 }
 
 void ASampleUIActor::OnClickButtonMsgBox() {
-	UHvInterface::MsgBox(FText::FromString("Hello World!"), FText::FromString(FString("Welcome ") + UHvInterface::getUserName()), nullptr, EMsgBoxFlag::Ok);
+	UHvInterface::MsgBox(HVSTRING("HelloWorld"), FText::FromString(UHVStringRes::GetString("Welcome") + UHvInterface::getUserName()), nullptr, EMsgBoxFlag::Ok);
 }

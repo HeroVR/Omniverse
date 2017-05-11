@@ -4,6 +4,7 @@
 #include "HVSDKSampleUE4GameInstance.h"
 #include "OmniControllerPluginFunctionLibrary.h"
 #include "HVInterface.h"
+#include "HVStringRes.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 
@@ -17,6 +18,7 @@ void UHVSDKSampleUE4GameInstance::Init()
 	UHeadMountedDisplayFunctionLibrary::EnableHMD(true);
 #if USE_HVSDK_CPP
 	UHvInterface::init(1019, "01ec17dac7140c0fbe936ee128310000", "omni=1");
+	UHVStringRes::LoadString("SampleLocalization");
 #endif
 }
 

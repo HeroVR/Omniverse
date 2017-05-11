@@ -56,8 +56,8 @@ AHVSDKSampleUE4Character::AHVSDKSampleUE4Character()
 
 	// Create OmniControllerComponent
 	OmniControllerComponent = CreateDefaultSubobject<UOmniControllerComponent>(TEXT("OmniControllerComponent"));
-	OmniControllerComponent->Camera = FirstPersonCameraComponent;
 	OmniControllerComponent->InitOmniDone.AddDynamic(this, &AHVSDKSampleUE4Character::OnInitOmniDone);
+	//OmniControllerComponent->Camera = FirstPersonCameraComponent;
 }
 
 void AHVSDKSampleUE4Character::BeginPlay()
