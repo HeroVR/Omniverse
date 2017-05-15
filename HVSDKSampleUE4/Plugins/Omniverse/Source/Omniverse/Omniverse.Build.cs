@@ -82,7 +82,7 @@ public class Omniverse : ModuleRules
         //string ModulePath = Path.GetDirectoryName(RulesCompiler.GetModuleFilename(this.GetType().Name));
         string MyLibraryPath = Path.Combine(ModulePath, "ThirdParty", "hidapi/windows/x64/Release");
 		PublicIncludePaths.Add(Path.Combine(MyLibraryPath));
-        PublicAdditionalLibraries.Add(Path.Combine(MyLibraryPath, "hidapi.lib"));
+        //PublicAdditionalLibraries.Add(Path.Combine(MyLibraryPath, "hidapi.lib"));
         return true;
     }
 

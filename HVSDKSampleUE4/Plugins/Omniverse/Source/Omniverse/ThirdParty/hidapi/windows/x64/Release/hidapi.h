@@ -29,7 +29,7 @@
 
 #include <wchar.h>
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(HIDAPI_DLL)
       #define HID_API_EXPORT __declspec(dllexport)
       #define HID_API_CALL
 #else
