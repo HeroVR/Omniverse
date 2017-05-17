@@ -240,7 +240,8 @@ public class HVControllerRay
                 //}
 
                 HVScrollView sv = null;
-                if (null != (sv = hits[i].collider.GetComponent<HVScrollView>()))
+                if (null != (sv = hits[i].collider.GetComponent<HVScrollView>())
+                    && hits[i].collider.GetComponent<HVUIEventListener>())
                 {
 					RectTransform trans = sv.transform as RectTransform;
 					Vector3 t = trans.InverseTransformPoint(hits[i].point);
@@ -474,8 +475,10 @@ public class HVControllerRay
             int device_index = -1;
             if (i == RAY_MOUSE)
             {
-                device_index = 0;
-
+                if(!SteamVR.enabled)
+                {
+                    device_index = 0;
+                }
 				if (_MainCamera)
 				{
 					StereoTargetEyeMask target_eye = StereoTargetEyeMask.None;
@@ -547,7 +550,7 @@ public class HVControllerRay
             var pose = new SteamVR_Utils.RigidTransform(poses[i].mDeviceToAbsoluteTracking);
             if (_Ray[j].line)
             {
-                Vector3 pos = pose.pos;
+                //Vector3 pos = pose.pos;
                 if (_ViveControllerMgr)
                 {
                     _Ray[j].line.transform.position = _ViveControllerMgr.transform.TransformPoint(pose.pos);

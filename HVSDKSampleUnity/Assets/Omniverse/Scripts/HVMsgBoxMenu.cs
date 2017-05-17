@@ -10,7 +10,7 @@ using System;
 struct HVMenuItemDef
 {
 	public int x, y, w, h, rot;
-	public string type, style, color;
+	public string type, style, color, name;
 	public string cmd; //format: txt_arg;txt_format;cmd_type;close_after_click;
 }
 
@@ -23,16 +23,22 @@ struct HVMenuDef
 
 struct HVMenuItem
 {
+	public GameObject go;
+	public bool dynaTxt;
 	public Text txtCompo;
-	public string cmd;
+	public string name, cmd;
 }
 
 public class HVMsgBoxMenu : HVMsgBox
 {
-	Transform _BG;
+	public string _JsonFilePrefix = "systemmenu";
 
-	Dictionary<GameObject, HVMenuItem> _Items = new Dictionary<GameObject, HVMenuItem>();
+	Transform _BG;	
+
+	List<HVMenuItem> _Items = new List<HVMenuItem>();
 	float _UpdateTimer = 0;
+
+	public static List<HVMsgBoxMenu> _AllMsgBoxJson = new List<HVMsgBoxMenu>();
 
 	protected override void Start ()
 	{
@@ -45,7 +51,8 @@ public class HVMsgBoxMenu : HVMsgBox
 			_BG = transform;
 		}
 
-		string json = ReadFile(HVSDK.GetUserInfoImpl().sConsolePath + "\\systemmenu_unity.json");
+		string path = HVSDK.GetUserInfoImpl().sConsolePath + "\\" + _JsonFilePrefix + "_unity.json";
+		string json = ReadFile(path);
 		HVMenuDef def;
 		def.x = def.y = def.w = def.h = 0;
 		def.items = null;
@@ -68,6 +75,8 @@ public class HVMsgBoxMenu : HVMsgBox
 				HVUIEventListener.Get(go.gameObject).onClick = this.OnClick;
 			}					
 		}
+
+		_AllMsgBoxJson.Add(this);
     }
 
     // Update is called once per frame
@@ -80,13 +89,20 @@ public class HVMsgBoxMenu : HVMsgBox
 		{
 			_UpdateTimer = 0;
 
-			foreach (KeyValuePair<GameObject, HVMenuItem> item in _Items)
+			foreach (HVMenuItem item in _Items)
 			{
-				if (item.Value.txtCompo) {
-					UpdateText(item.Value.txtCompo, item.Value.cmd);
+				if (item.dynaTxt && item.txtCompo) {
+					UpdateText(item.txtCompo, item.cmd);
 				}				
 			}
 		}
+	}
+
+	protected override void OnDestroy()
+	{
+		_AllMsgBoxJson.Remove(this);
+
+		base.OnDestroy();
 	}
 
 	bool UpdateText(Text compo, string cmd)
@@ -108,7 +124,7 @@ public class HVMsgBoxMenu : HVMsgBox
 				switch (type)
 				{
 					case 1:
-						content = string.Format("{0}", ui.nGameDurationLeft);
+						content = string.Format("{0}", ui.nGameDurationLeft / 60);
 						need_update = true;
 						break;
 					case 2:
@@ -127,6 +143,10 @@ public class HVMsgBoxMenu : HVMsgBox
 					case 6:
 						content = di.sShopName;
 						break;
+                    case 7:
+                        content = string.Format("{0}", ui.nGameDuration / 60);
+                        need_update = true;
+                        break;
 				}
 
 				compo.text = string.Format(cmds[1], content);
@@ -144,7 +164,7 @@ public class HVMsgBoxMenu : HVMsgBox
 
 		bool close = true;
 
-		char[] sep = { ';' };
+		char[] sep = { '|' };
 		string[] cmds = sender.tag.Split(sep);
 		if (cmds.Length > 2)
 		{
@@ -222,8 +242,11 @@ public class HVMsgBoxMenu : HVMsgBox
 		if (prefab)
 		{
 			go = GameObject.Instantiate(prefab, _BG) as GameObject;
+
 			HVMenuItem item = new HVMenuItem();
+			item.go = go;
 			item.cmd = def.cmd;
+			item.name = def.name;
 
 			// Rect
 			ApplyTransRect(go.transform as RectTransform, def.x, def.y, def.w, def.h, def.rot);
@@ -249,13 +272,27 @@ public class HVMsgBoxMenu : HVMsgBox
 				}
 			}
 
-			if (txt_compo && UpdateText(txt_compo, def.cmd))
-			{
-				item.txtCompo = txt_compo;
-			}
+			item.txtCompo = txt_compo;
+			item.dynaTxt = (txt_compo && UpdateText(txt_compo, def.cmd));
 
-			_Items.Add(go, item);
+			_Items.Add(item);
 		}
 		return go;
+	}
+
+	public bool UpdateItemCmd(string name, string cmd)
+	{
+		for (int i = 0; i < _Items.Count; ++i)
+		{
+			HVMenuItem item = _Items[i];
+			if (item.name == name)
+			{
+				item.cmd = cmd;
+				item.dynaTxt = (item.txtCompo && UpdateText(item.txtCompo, cmd));
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

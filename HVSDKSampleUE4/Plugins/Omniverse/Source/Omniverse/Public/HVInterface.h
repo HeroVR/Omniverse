@@ -179,7 +179,10 @@ public:
 	static AHVDlgBase *MsgBoxBP(FText Title, FText Content, EMsgBoxFlag::Flag Flag = EMsgBoxFlag::OkCancel);
 
 	UFUNCTION(BlueprintCallable, Category = "HVSDK")
-	static AHVDlgBase *ShowDlgJson(FString jsonFilePrefix);
+	static AHVDlgBase *ShowDlgJson(const FString &jsonFilePrefix);
+
+	UFUNCTION(BlueprintCallable, Category = "HVSDK")
+	static void UpdateDlgJsonWidgetCmd(const FString &jsonFilePrefix, const FString &widgetName, const FString &cmd);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetActor", Keywords = "GetActor"), Category = "HVSDK")
 	static AHVRayActor *GetActor();
@@ -218,4 +221,6 @@ private:
 	static void onEventResumeGame(const char *sRet);
 	static void onEventResumeGameResult(const char *sRet);
 	static void onEventSystemMenu(const char *sRet);
+public:
+	static void onEventUpdateDlgJsonCmd(const char *sRet);
 };

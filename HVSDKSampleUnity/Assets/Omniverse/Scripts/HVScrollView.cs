@@ -70,6 +70,11 @@ public class HVScrollView : MonoBehaviour
         }
     }
 
+    public void ResetContent()
+    {
+        _Content.anchoredPosition = new Vector2(0, 0);
+    }
+
     void AdjustContent()
     {
         if (_axial == axial.Horizontal)
@@ -310,7 +315,7 @@ public class HVScrollView : MonoBehaviour
                 if (Input.GetMouseButton(0))
                 {
                     newpos = ped.position;
-                    Debug.Log("newpos:" + newpos + "_StartPos:" + _StartPos + "=" + Vector2.Distance(newpos, _StartPos));
+                  //  Debug.Log("newpos:" + newpos + "_StartPos:" + _StartPos + "=" + Vector2.Distance(newpos, _StartPos));
 
                 }
 

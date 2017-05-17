@@ -13,7 +13,8 @@ class UJsonWidget : public UObject
 
 public:
 	UWidget *Widget;
-	FString Cmd;
+	FString Name, Cmd;
+	bool DynaText;
 	UTextBlock *TxtWidget;	
 	AHVDlgJson *Dlg;
 
@@ -30,14 +31,16 @@ class OMNIVERSE_API AHVDlgJson : public AHVDlgBase
 	~AHVDlgJson();
 
 	bool LoadJson(const char *jsonFilePrefix);
+	bool UpdateCmd(const FString &name, const FString &cmd);
 
 	static char* LoadFile(const char *path);
 protected:
 	class UClass *ButtonClass, *TextClass;
 
+	FString JsonPrefix;
 	TArray<UJsonWidget*> JsonWidgets;
 
-	bool NewWidget(UPanelWidget *panel, const FString &type, TSubclassOf<class UObject> clazz, int x, int y, int w, int h, const FString &style, const FString &cmd);
+	bool NewWidget(UPanelWidget *panel, const FString &name, const FString &type, TSubclassOf<class UObject> clazz, int x, int y, int w, int h, const FString &style, const FString &cmd);
 	bool UpdateText(UTextBlock *txtWidget, const FString &cmd);
 
 	virtual void Tick(float DeltaTime) override;

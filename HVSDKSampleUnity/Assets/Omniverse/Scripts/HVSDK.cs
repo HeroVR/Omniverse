@@ -99,7 +99,7 @@ public class HVSDK : MonoBehaviour
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
         public string sConsolePath;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 68)]
         string sReserved;
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
@@ -369,18 +369,27 @@ public class HVSDK : MonoBehaviour
         else if (type.Substring(0, 4) == "ipc.")
         {
             string id = type.Substring(4);
-            if (id == "2")
-            {
-                onEventResumeGame(ret);
-            }
-            else if (id == "5")
-            {
-                onEventResumeGameResult(ret);
-            }
-            else if (id == "9")
-            {
-                onEventSystemMenu(ret);
-            }
+			if (id == "2")
+			{
+				onEventResumeGame(ret);
+			}
+			else if (id == "5")
+			{
+				onEventResumeGameResult(ret);
+			}
+			else if (id == "9")
+			{
+				onEventSystemMenu(ret);
+			}
+			else if (id == "12")
+			{
+				onEventMsgBoxJson(ret);
+			}
+			else if (id == "13")
+			{
+				onEventMsgBoxJsonCmd(ret);
+			}
+
             if (null != _hvMsgCallBack)
             {
                 _hvMsgCallBack(int.Parse(id), ret);
@@ -501,7 +510,7 @@ public class HVSDK : MonoBehaviour
 
     // HeroVR System Menu
     static HVMsgBox _MsgboxSystemMenu = null;
-    public static bool _DisableSystemMenu = false;    //for test System-Menu in development environment.
+	public static bool _DisableSystemMenu = false;    //for test System-Menu in development environment.
 
     static void onEventSystemMenu(string param)
     {
@@ -551,7 +560,49 @@ public class HVSDK : MonoBehaviour
         return false;
     }
 
-    public static void CheckOmniViveAvailable(bool bSwitchToDevModeIfNA = true)
+	static void onEventMsgBoxJson(string param)
+	{
+		MsgBoxJson(param);
+	}
+
+	public static void MsgBoxJson(string param)
+	{
+		GameObject mb = GameObject.Instantiate(Resources.Load("HVSDK_MsgboxMenu"), Vector3.zero, Quaternion.identity) as GameObject;
+		if (mb)
+		{
+			HVMsgBoxMenu mbm = mb.GetComponentInChildren<HVMsgBoxMenu>();
+			if (null != mbm) {
+				mbm._JsonFilePrefix = param;
+			}
+		}
+	}
+
+	static void onEventMsgBoxJsonCmd(string param)
+	{
+		string prefix = null, name = null, cmd = null;
+		int sep = param.IndexOf(' ');
+		if (sep > 0)
+		{
+			prefix = param.Substring(0, sep);
+			int sep2 = param.IndexOf(' ', sep + 1);
+			if (sep2 > 0) {
+				name = param.Substring(sep + 1, sep2 - sep - 1);
+				cmd = param.Substring(sep2 + 1);
+			}
+		}
+
+		if (cmd != null)
+		{
+			foreach (HVMsgBoxMenu mbm in HVMsgBoxMenu._AllMsgBoxJson)
+			{
+				if (mbm._JsonFilePrefix == prefix) {
+					mbm.UpdateItemCmd(name, cmd);
+				}
+			}
+		}		
+	}
+
+	public static void CheckOmniViveAvailable(bool bSwitchToDevModeIfNA = true)
     {
         OmniController omni_controller = null;
         if (!VRSettings.enabled && bSwitchToDevModeIfNA)
@@ -570,6 +621,7 @@ public class HVSDK : MonoBehaviour
             }
         }
 
+		/*
         if (null == omni_controller)
         {
             omni_controller = GameObject.FindObjectOfType<SteamVROmniController>();
@@ -580,14 +632,20 @@ public class HVSDK : MonoBehaviour
             Transform steam_camera_rig_offset = omni_controller.transform.Find("ViveSetupCameraRigParent/ViveSetupCameraRigRootOffset");
             if (steam_camera_rig_offset)
             {
-                steam_camera_rig_offset.localPosition = Vector3.zero;
+              //  steam_camera_rig_offset.localPosition = Vector3.zero;
             }
 
-            if (!omni_controller.omniFound)
+            if (Input.GetKeyDown(KeyCode.D))
             {
                 omni_controller.developerMode = true;
+                Debug.Log("not Found omni to set developerMode"+ omni_controller.developerMode);
+            }
+            else
+            {
+                omni_controller.developerMode = false;
             }
         }
+		*/
     }
 
     static int _SysLang = -1;

@@ -102,7 +102,15 @@ public class Main : MonoBehaviour {
     {
         HVMsgBox hmb = HVSDK.MsgBox("", "HVSDK", "Hello World!!", HVSDK.GetString("OK"));
         hmb._onEvent = OnClickSampleMsgBoxOK;
-    }
+
+		// test MsgBoxJson;
+		//if (HVMsgBoxMenu._AllMsgBoxJson.Count == 0)	{
+		//	HVSDK.MsgBoxJson("test");
+		//}
+		//else {
+		//	HVSDK.onEventMsgBoxJsonText("test ExtendButton 1|<size=14><color=#FFFFFF>Remaining Game time : </color><color=#00FFFF>{0} Min.</color></size>");
+		//}		
+	}
 
     bool OnClickSampleMsgBoxOK(HVMsgBox hmb, string sEvent, GameObject sender)
     {

@@ -20,13 +20,13 @@ public class HVButton : MonoBehaviour
     [SerializeField]
     public Sprite _StyleNormal;
     [SerializeField]
-    private Sprite _StyleHover;
+    public Sprite _StyleHover;
     [SerializeField]
-    private Sprite _StylePress;    
+    public Sprite _StylePress;    
     [SerializeField]
-    private Sprite _StyleDisable;
+    public Sprite _StyleDisable;
     [SerializeField]
-    private Sprite _StylePressed;
+    public Sprite _StylePressed;
     //private GameObject GameControl;
     Collider _buttonCollider;
     public bool _isCheckBox;
@@ -153,10 +153,11 @@ public class HVButton : MonoBehaviour
 
     public virtual void CloseCheck(GameObject sender)
     {
-        if(gameObject!= sender)
+        if (gameObject!= sender && this._isCheckBox)
         {
             _isChecked = false;
             this.SetButtonState(HVButtonState.Normal);
+           // this.m_OnClick.Invoke();
         }
 
     }

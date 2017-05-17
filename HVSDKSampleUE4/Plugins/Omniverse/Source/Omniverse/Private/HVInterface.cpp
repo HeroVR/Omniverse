@@ -66,6 +66,9 @@ void __stdcall UHvInterface::dllcallback(const char *sName, const char *sRet, un
 		else if (strcmp(sName + 4, "12") == 0) {
 			UHvInterface::ShowDlgJson(sRet);
 		}
+		else if (strcmp(sName + 4, "13") == 0) {
+			UHvInterface::onEventUpdateDlgJsonCmd(sRet);
+		}
 	}
 }
 
@@ -266,7 +269,7 @@ AHVDlgBase *UHvInterface::MsgBox(FText Title, FText Content, HVMSGBOX_CALLBACK F
 	return Box;
 }
 
-AHVDlgBase *UHvInterface::ShowDlgJson(FString jsonFilePrefix)
+AHVDlgBase *UHvInterface::ShowDlgJson(const FString &jsonFilePrefix)
 {
 	UWorld *world = GetGameWorld();
 	if (nullptr == world) {
@@ -278,6 +281,40 @@ AHVDlgBase *UHvInterface::ShowDlgJson(FString jsonFilePrefix)
 		dlg->LoadJson(TCHAR_TO_ANSI(*jsonFilePrefix));
 	}
 	return dlg;	
+}
+
+void UHvInterface::UpdateDlgJsonWidgetCmd(const FString &jsonFilePrefix, const FString &widgetName, const FString &cmd)
+{
+	for (int i = 0; i < DlgList.Num(); ++i)
+	{
+		AHVDlgJson *dlg = Cast<AHVDlgJson>(DlgList[i]);
+		if (dlg != nullptr && dlg->JsonPrefix == jsonFilePrefix) {
+			dlg->UpdateCmd(widgetName, cmd);
+		}
+	}
+}
+
+void UHvInterface::onEventUpdateDlgJsonCmd(const char *sRet)
+{
+	FString param = UTF8_TO_TCHAR(sRet);
+	FString prefix, name, cmd;
+
+	int32 sep = 0, sep2 = 0;
+	if (param.FindChar(' ', sep))
+	{
+		prefix = param.Mid(0, sep);
+		sep2 = param.Find(TEXT(" "), ESearchCase::CaseSensitive, ESearchDir::FromStart, sep + 1);
+		if (sep2 > 0)
+		{
+			name = param.Mid(sep + 1, sep2 - sep - 1);
+			cmd = param.Mid(sep2 + 1);
+		}
+	}
+
+	if (!cmd.IsEmpty())	{
+		UpdateDlgJsonWidgetCmd(prefix, name, cmd);
+	}
+	
 }
 
 UWorld* UHvInterface::GetGameWorld()

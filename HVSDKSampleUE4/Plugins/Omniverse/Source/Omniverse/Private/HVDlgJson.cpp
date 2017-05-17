@@ -31,6 +31,8 @@ AHVDlgJson::~AHVDlgJson()
 
 bool AHVDlgJson::LoadJson(const char *jsonFilePrefix)
 {
+	JsonPrefix = UTF8_TO_TCHAR(jsonFilePrefix);
+
 	UPanelWidget *panel = RootWidget ? (UPanelWidget*)RootWidget->GetRootWidget() : nullptr;
 	if (nullptr == panel) {
 		return false;
@@ -72,19 +74,20 @@ bool AHVDlgJson::LoadJson(const char *jsonFilePrefix)
 			jo.TryGetNumberField("w", w);
 			jo.TryGetNumberField("h", h);
 
-			FString type, style, cmd;
+			FString name, type, style, cmd;
+			jo.TryGetStringField("name", name);
 			jo.TryGetStringField("type", type);
 			jo.TryGetStringField("style", style);
 			jo.TryGetStringField("cmd", cmd);
 
-			NewWidget(panel, type, type == "Button" ? ButtonClass : TextClass, x, y, w, h, style, cmd);
+			NewWidget(panel, name, type, type == "Button" ? ButtonClass : TextClass, x, y, w, h, style, cmd);
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Json " + values[i]->AsObject()->);
 		}
 	}
 	return true;
 }
 
-bool AHVDlgJson::NewWidget(UPanelWidget *panel, const FString &type, TSubclassOf<class UObject> clazz, int x, int y, int w, int h, const FString &style, const FString &cmd)
+bool AHVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FString &type, TSubclassOf<class UObject> clazz, int x, int y, int w, int h, const FString &style, const FString &cmd)
 {
 	if (type != "Button" && type != "Text") {
 		return false;
@@ -127,11 +130,10 @@ bool AHVDlgJson::NewWidget(UPanelWidget *panel, const FString &type, TSubclassOf
 		mw->AddToRoot();
 		mw->Dlg = this;
 		mw->Widget = widget;
+		mw->Name = name;
 		mw->Cmd = cmd;
-		mw->TxtWidget = nullptr;
-		if (txtWidget && UpdateText(txtWidget, cmd)) {
-			mw->TxtWidget = txtWidget;
-		}
+		mw->TxtWidget = txtWidget;
+		mw->DynaText = (txtWidget && UpdateText(txtWidget, cmd));
 
 		if (btn) {
 			btn->OnClicked.AddDynamic(&*mw, &UJsonWidget::OnClick);
@@ -191,6 +193,21 @@ bool AHVDlgJson::UpdateText(UTextBlock *txtWidget, const FString &cmd)
 	return need_update;
 }
 
+bool AHVDlgJson::UpdateCmd(const FString &name, const FString &cmd)
+{
+	for (int i = 0; i < JsonWidgets.Num(); ++i)
+	{
+		UJsonWidget *jw = JsonWidgets[i];
+		if (jw->Name == name)
+		{
+			jw->Cmd = cmd;
+			jw->DynaText = (jw->TxtWidget && UpdateText(jw->TxtWidget, jw->Cmd));
+			return true;
+		}
+	}
+	return false;
+}
+
 void AHVDlgJson::EndPlay(const EEndPlayReason::Type reason)
 {
 	for (int i = 0; i < JsonWidgets.Num(); ++i) {
@@ -207,7 +224,7 @@ void AHVDlgJson::Tick(float DeltaTime)
 
 	for (int i = 0; i < JsonWidgets.Num(); ++i) 
 	{
-		if (JsonWidgets[i]->TxtWidget) {
+		if (JsonWidgets[i]->DynaText && JsonWidgets[i]->TxtWidget) {
 			UpdateText(JsonWidgets[i]->TxtWidget, JsonWidgets[i]->Cmd);
 		}
 	}

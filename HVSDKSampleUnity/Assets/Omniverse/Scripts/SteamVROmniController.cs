@@ -59,7 +59,7 @@ namespace Virtuix
                 {
                     cameraReference.gameObject.AddComponent<SmoothMouseLook>();
                 }
-                viveRootObject.localPosition = new Vector3(0, 1, 0);
+                viveRootObject.localPosition = new Vector3(0, this.GetComponent<CharacterController>().height/2, 0);
                 return;
             }
 

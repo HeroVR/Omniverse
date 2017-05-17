@@ -66,7 +66,7 @@ public class HVMsgBox : MonoBehaviour
 		}		
 	}
 
-    void OnDestroy()
+    protected virtual void OnDestroy()
     {
         if (_onEvent != null) {
             _onEvent(this, "destroy", gameObject);

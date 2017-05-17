@@ -47,13 +47,14 @@ void ASampleUIActor::BeginPlay()
 void ASampleUIActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ASampleUIActor::OnClickButtonPurchase() {
 	UHvInterface::buy("TestItem", 1, FString("SampleTradeID_") + FString::FromInt(time(nullptr)));
 }
 
-void ASampleUIActor::OnClickButtonMsgBox() {
+void ASampleUIActor::OnClickButtonMsgBox() 
+{
 	UHvInterface::MsgBox(HVSTRING("HelloWorld"), FText::FromString(UHVStringRes::GetString("Welcome") + UHvInterface::getUserName()), nullptr, EMsgBoxFlag::Ok);
+	//UHvInterface::onEventUpdateDlgJsonCmd("test HHHH 1|Game time left: {0} sec.");
 }
