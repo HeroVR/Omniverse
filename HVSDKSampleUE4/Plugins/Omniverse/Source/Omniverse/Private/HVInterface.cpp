@@ -54,17 +54,17 @@ void __stdcall UHvInterface::dllcallback(const char *sName, const char *sRet, un
 	}
 	else if (strncmp(sName, "ipc.", 4) == 0)
 	{
-		if (sName[4] == '2')
-		{
+		if (sName[4] == '2') {
 			UHvInterface::onEventResumeGame(sRet);
 		}
-		else if (sName[4] == '5')
-		{
+		else if (sName[4] == '5') {
 			UHvInterface::onEventResumeGameResult(sRet);
 		}
-		else if (sName[4] == '9')
-		{
+		else if (sName[4] == '9') {
 			UHvInterface::onEventSystemMenu(sRet);
+		}
+		else if (strcmp(sName + 4, "12") == 0) {
+			UHvInterface::ShowDlgJson(sRet);
 		}
 	}
 }
@@ -264,6 +264,20 @@ AHVDlgBase *UHvInterface::MsgBox(FText Title, FText Content, HVMSGBOX_CALLBACK F
 	}
 
 	return Box;
+}
+
+AHVDlgBase *UHvInterface::ShowDlgJson(FString jsonFilePrefix)
+{
+	UWorld *world = GetGameWorld();
+	if (nullptr == world) {
+		return nullptr;
+	}
+
+	AHVDlgJson *dlg = world->SpawnActor<AHVDlgJson>(AHVDlgJson::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
+	if (dlg) {
+		dlg->LoadJson(TCHAR_TO_ANSI(*jsonFilePrefix));
+	}
+	return dlg;	
 }
 
 UWorld* UHvInterface::GetGameWorld()

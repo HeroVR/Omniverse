@@ -178,6 +178,8 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "MsgBox", Keywords = "MsgBox"), Category = "HVSDK")
 	static AHVDlgBase *MsgBoxBP(FText Title, FText Content, EMsgBoxFlag::Flag Flag = EMsgBoxFlag::OkCancel);
 
+	UFUNCTION(BlueprintCallable, Category = "HVSDK")
+	static AHVDlgBase *ShowDlgJson(FString jsonFilePrefix);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetActor", Keywords = "GetActor"), Category = "HVSDK")
 	static AHVRayActor *GetActor();
