@@ -36,12 +36,12 @@ void AHVMsgBox::Init(FText title, FText content, HVMSGBOX_CALLBACK func, EMsgBox
 
 		CallbackFunc = func;
 
-		BtnYes = InitButton ("btn_yes", HVSTRING("Yes"), flag == EMsgBoxFlag::OkCancel || flag == EMsgBoxFlag::Ok);
+		BtnYes = Cast<UButton>(InitWidget("btn_yes", HVSTRING("Yes"), flag == EMsgBoxFlag::OkCancel || flag == EMsgBoxFlag::Ok));
 		if (BtnYes) {
 			BtnYes->OnClicked.AddDynamic(this, &AHVMsgBox::BtnYesClicked);
 		}
 
-		BtnCancel = InitButton("btn_cancel", HVSTRING("Cancel"), flag == EMsgBoxFlag::OkCancel || flag == EMsgBoxFlag::Cancel);
+		BtnCancel = Cast<UButton>(InitWidget("btn_cancel", HVSTRING("Cancel"), flag == EMsgBoxFlag::OkCancel || flag == EMsgBoxFlag::Cancel));
 		if (BtnCancel) {
 			BtnCancel->OnClicked.AddDynamic(this, &AHVMsgBox::BtnCancelClicked);
 		}

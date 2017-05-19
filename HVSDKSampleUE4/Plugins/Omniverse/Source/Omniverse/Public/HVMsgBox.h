@@ -18,8 +18,6 @@ namespace EMsgBoxFlag
 
 typedef void (*HVMSGBOX_CALLBACK)(int32 BtnIndex);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMsgBoxEvent, FString, sType, FString, sWidget);
-
 UCLASS()
 class OMNIVERSE_API AHVMsgBox : public AHVDlgBase
 {
@@ -27,9 +25,6 @@ class OMNIVERSE_API AHVMsgBox : public AHVDlgBase
 	friend class UHvInterface;
 
 	void Init(FText title, FText content, HVMSGBOX_CALLBACK func, EMsgBoxFlag::Flag flag = EMsgBoxFlag::OkCancel);
-
-	UPROPERTY(BlueprintAssignable, Category = "HVMsgBox")
-	FMsgBoxEvent MsgBoxEvent;
 
 protected:
 	UButton *BtnYes;

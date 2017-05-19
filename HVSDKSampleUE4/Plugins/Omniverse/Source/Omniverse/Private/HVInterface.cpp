@@ -283,6 +283,44 @@ AHVDlgBase *UHvInterface::ShowDlgJson(const FString &jsonFilePrefix)
 	return dlg;	
 }
 
+AHVDlgBase* UHvInterface::ShowDlgBP(TSubclassOf<UUserWidget> uiAsset, FVector loc, FRotator rot)
+{
+	UWorld *world = GetGameWorld();
+	if (nullptr == world) {
+		return nullptr;
+	}
+
+	AHVDlgBase *dlg = world->SpawnActor<AHVDlgBase>(AHVDlgBase::StaticClass(), loc, rot);
+	if (dlg) {
+		dlg->SetWidgetClass(uiAsset);
+	}
+	return dlg;
+}
+
+AHVDlgBase *UHvInterface::ShowDlgPrompt(FText text, FVector loc, FRotator rot, bool alwaysOnCamera, bool billboard, float duration, float fadeout)
+{
+	UWorld *world = GetGameWorld();
+	if (nullptr == world) {
+		return nullptr;
+	}
+
+	AHVDlgBase *dlg = nullptr;
+	UClass *clz = StaticLoadClass(UUserWidget::StaticClass(), world, TEXT("Class'/Omniverse/HvSDK/Prompt.Prompt_C'"));
+	if (clz)
+	{
+		dlg = world->SpawnActor<AHVDlgBase>(AHVDlgBase::StaticClass(), loc, rot);
+		if (dlg)
+		{
+			dlg->SetAttribute(false, alwaysOnCamera, billboard, duration, fadeout);
+
+			dlg->SetWidgetClass(clz);
+			dlg->InitWidget("Content", text);
+		}
+	}
+
+	return dlg;
+}
+
 void UHvInterface::UpdateDlgJsonWidgetCmd(const FString &jsonFilePrefix, const FString &widgetName, const FString &cmd)
 {
 	for (int i = 0; i < DlgList.Num(); ++i)
@@ -361,11 +399,12 @@ void UHvInterface::BeginPlayDlgBase(AHVDlgBase *Dlg)
 
 void UHvInterface::EndPlayDlgBase(AHVDlgBase *Dlg)
 {
-	DlgList.Remove(Dlg);
-
-	for (int i = 0; i < DlgList.Num(); ++i) {
-		DlgList[i]->DlgIndex = i;
-	}
+	if (DlgList.Remove(Dlg) >= 0)
+	{
+		for (int i = 0; i < DlgList.Num(); ++i) {
+			DlgList[i]->DlgIndex = i;
+		}
+	}	
 }
 
 void UHvInterface::OnRayActorDestroyed()

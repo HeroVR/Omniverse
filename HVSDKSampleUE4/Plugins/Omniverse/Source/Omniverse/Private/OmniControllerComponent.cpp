@@ -63,7 +63,7 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 
 				if (bAutoCorrectStartYaw && !bStartYawCorrected) {
 					bStartYawCorrected = true;
-					StartYawDiff = pawn->GetActorRotation().Yaw - OmniYaw;
+					StartYawDiff = pawn->GetActorRotation().Yaw - OmniYaw;	//difference between Vive and Game
 				}
 
 				float cameraYaw = Camera ? Camera->GetComponentTransform().Rotator().Yaw : 0;
@@ -89,7 +89,7 @@ void UOmniControllerComponent::CheckOmniState()
 		{
 			InitOmniDone.Broadcast();
 
-			UOmniControllerPluginFunctionLibrary::ResetStepCount();
+			//UOmniControllerPluginFunctionLibrary::ResetStepCount();
 		}
 
 		OmniYawOffset = UHvInterface::getOmniYawOffset();

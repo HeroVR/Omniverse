@@ -10,9 +10,12 @@ AHVDlgBase::AHVDlgBase(const FObjectInitializer& ObjectInitializer)
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickEnabled(true);
 
-	bIsStatic = true;
 	bShowRay = true;
 	bAlwaysOnCamera = true;
+
+	AutoCloseTime = 0;
+	AutoFadeoutTime = 0.5f;
+	AutoCloseTimeLeft = 0;
 
 	RootWidget = NULL;
 	DlgIndex = 0;
@@ -35,7 +38,22 @@ void AHVDlgBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UHvInterface::BeginPlayDlgBase(this);
+	AutoCloseTimeLeft = AutoCloseTime;
+
+	//if (RootWidget)
+	//{
+	//	RootWidget->WidgetTree->ForEachWidget([&] (UWidget *widget) {
+	//			UButton *btn = Cast<UButton>(widget);
+	//			if (btn) {
+	//				btn->OnClicked.AddDynamic(this, &AHVDlgBase::BtnClicked);
+	//			}
+	//		}
+	//	);
+	//}
+
+	if (bShowRay) {
+		UHvInterface::BeginPlayDlgBase(this);
+	}
 }
 
 #if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 15
@@ -47,7 +65,10 @@ void AHVDlgBase::EndPlay();
 {
 	Super::EndPlay();
 #endif
+
 	UHvInterface::EndPlayDlgBase(this);
+
+	OnDlgEvent("end", "");
 }
 
 UWorld* AHVDlgBase::GetWorld() const
@@ -77,50 +98,114 @@ void AHVDlgBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bAlwaysOnCamera && GWorld)
+	if (GWorld)
 	{
-		APlayerController* controller = GWorld->GetFirstPlayerController();
-		if (controller)
+		if (AutoCloseTime > 0.001f)
 		{
-			FVector camera_loc;
-			FRotator camera_rot;
-			controller->GetPlayerViewPoint(camera_loc, camera_rot);
+			AutoCloseTimeLeft -= DeltaTime;
+			if (AutoCloseTimeLeft < 0.001f) {
+				GWorld->DestroyActor(this);
+				return;
+			}
 
-			FVector camera_dir = camera_rot.Vector();
-			FVector loc = camera_loc + camera_dir * (UHvInterface::GetInstance()->UmgDistance - 1.0f * DlgIndex);
+			if (AutoFadeoutTime > 0.001f && AutoCloseTimeLeft < AutoFadeoutTime) 
+			{
+				float alpha = AutoCloseTimeLeft / AutoFadeoutTime;
+				WidgetComponent->GetMaterialInstance()->SetVectorParameterValue("TintColorAndOpacity", FLinearColor(1, 1, 1, alpha));
+			}
+		}
 
-			SetActorLocationAndRotation(loc, camera_rot);			
+		if (bAlwaysOnCamera || bBillboard)
+		{
+			APlayerController* controller = GWorld->GetFirstPlayerController();
+			if (controller)
+			{
+				FVector camera_loc;
+				FRotator camera_rot;
+				controller->GetPlayerViewPoint(camera_loc, camera_rot);
+
+				if (bAlwaysOnCamera)
+				{
+					FVector camera_dir = camera_rot.Vector();
+					FVector loc = camera_loc + camera_dir * (UHvInterface::GetInstance()->UmgDistance - 1.0f * DlgIndex);
+					SetActorLocationAndRotation(loc, camera_rot);
+				}			
+				else {
+					SetActorRotation(camera_rot);
+				}
+			}
 		}
 	}
 }
 
-UButton* AHVDlgBase::InitButton(const char *name, FText txt, bool visible)
+UWidget* AHVDlgBase::InitWidget(FName name, FText txt, bool visible)
 {
+	UWidget *widget = nullptr;
 	UButton *btn = nullptr;
+	UTextBlock *tb = nullptr;
 	if (RootWidget) 
 	{
-		UWidget *widget = RootWidget->GetWidgetFromName(name);
+		widget = RootWidget->GetWidgetFromName(name);
 		if (widget)
 		{
-
 			if (widget->IsA(UButton::StaticClass())) {
 				btn = (UButton*)widget;
 			}
-			else if (widget->IsA(UUserWidget::StaticClass())) {
-				btn = Cast<UButton>(((UUserWidget*)widget)->GetRootWidget());
+			else if (widget->IsA(UTextBlock::StaticClass())) {
+				tb = (UTextBlock *)widget;
 			}
-
-			if (btn)
+			else if (widget->IsA(UUserWidget::StaticClass())) 
 			{
-				UTextBlock *tb = Cast<UTextBlock>(btn->GetChildAt(0));
-				if (tb) {
-					tb->SetText(txt);
+				btn = Cast<UButton>(((UUserWidget*)widget)->GetRootWidget());
+				if (nullptr == btn) {
+					tb = Cast<UTextBlock>(((UUserWidget*)widget)->GetRootWidget());
 				}
-
-				btn->SetVisibility(visible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 			}
+
+			if (btn) {
+				tb = Cast<UTextBlock>(btn->GetChildAt(0));	
+			}
+
+			if (tb) {
+				tb->SetText(txt);
+			}
+
+			widget->SetVisibility(visible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 		}
 	}
 
-	return btn;
+	UWidget *ret = btn != nullptr ? btn : (tb != nullptr ? tb : widget);
+	return ret;
+}
+
+void AHVDlgBase::SetAttribute(bool showRay, bool alwaysOnCamera, bool billboard, float duartion, float fadeout)
+{
+	if (bShowRay != showRay)
+	{
+		if (bShowRay) {
+			UHvInterface::EndPlayDlgBase(this);
+		}
+		else {
+			UHvInterface::BeginPlayDlgBase(this);
+		}
+
+		bShowRay = showRay;
+	}
+
+	bAlwaysOnCamera = alwaysOnCamera;
+	bBillboard = billboard;
+
+	AutoCloseTimeLeft = AutoCloseTime = duartion;
+	AutoFadeoutTime = fadeout;
+}
+
+void AHVDlgBase::SetWidgetClass(TSubclassOf<UUserWidget> uiAsset)
+{
+	RootWidget = CreateWidget<UUserWidget>(GetWorld(), uiAsset);
+	WidgetComponent->SetWidget(RootWidget);
+}
+
+void AHVDlgBase::OnDlgEvent_Implementation(const FString &type, const FString &param)
+{
+	DlgEvent.Broadcast(type, param);
 }

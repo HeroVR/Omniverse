@@ -21,11 +21,11 @@ ASampleUIActor::ASampleUIActor(const FObjectInitializer& ObjectInitializer)
 		RootWidget = (UUserWidget*)CreateWidget<UUserWidget>(world, win_bp.Object);
 		WidgetComponent->SetWidget(RootWidget);
 
-		UButton *btn = InitButton("Button_Purchase", FText::FromString("Purchase"));
+		UButton *btn = Cast<UButton>(InitWidget("Button_Purchase", FText::FromString("Purchase")));
 		if (btn) {
 			btn->OnClicked.AddDynamic(this, &ASampleUIActor::OnClickButtonPurchase);
 		}
-		btn = InitButton("Button_MsgBox", FText::FromString("MsgBox"));
+		btn = Cast<UButton>(InitWidget("Button_MsgBox", FText::FromString("MsgBox")));
 		if (btn) {
 			btn->OnClicked.AddDynamic(this, &ASampleUIActor::OnClickButtonMsgBox);
 		}

@@ -182,6 +182,12 @@ public:
 	static AHVDlgBase *ShowDlgJson(const FString &jsonFilePrefix);
 
 	UFUNCTION(BlueprintCallable, Category = "HVSDK")
+	static AHVDlgBase *ShowDlgBP(TSubclassOf<UUserWidget> uiAsset, FVector loc = FVector::ZeroVector, FRotator rot = FRotator::ZeroRotator);
+
+	UFUNCTION(BlueprintCallable, Category = "HVSDK")
+	static AHVDlgBase *ShowDlgPrompt(FText text, FVector loc = FVector::ZeroVector, FRotator rot = FRotator::ZeroRotator, bool alwaysOnCamera = true, bool billboard = false, float duration = 2.0f, float fadeout = 1.0f);
+
+	UFUNCTION(BlueprintCallable, Category = "HVSDK")
 	static void UpdateDlgJsonWidgetCmd(const FString &jsonFilePrefix, const FString &widgetName, const FString &cmd);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetActor", Keywords = "GetActor"), Category = "HVSDK")

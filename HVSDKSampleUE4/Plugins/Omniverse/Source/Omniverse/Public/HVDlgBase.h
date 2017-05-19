@@ -10,6 +10,8 @@ class AActor;
 class AHVDlgBase;
 class UButton;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDlgEvent, FString, sType, FString, sWidget);
+
 UCLASS()
 class OMNIVERSE_API AHVDlgBase : public AActor
 {
@@ -28,26 +30,43 @@ public:
 #endif
 	virtual UWorld* GetWorld() const override;
 	
-	UPROPERTY(EditAnywhere)
-	bool bIsStatic;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bShowRay;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAlwaysOnCamera;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bBillboard;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AutoCloseTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AutoFadeoutTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UWidgetComponent *WidgetComponent;
 
-
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent)
 	void OnDlgEvent(const FString &type, const FString &param);
 
+	UPROPERTY(BlueprintAssignable, Category = "HVMsgBox")
+	FDlgEvent DlgEvent;
+
+	UFUNCTION(BlueprintCallable)
+	void SetAttribute(bool showRay, bool alwaysOnCamera = true, bool billboard = false, float duartion = 0, float fadeout = 0.5f);
+
+	UFUNCTION(BlueprintCallable)
+	void SetWidgetClass(TSubclassOf<UUserWidget> uiAsset);
+
+	UFUNCTION(BlueprintCallable)
+	UWidget* InitWidget(FName name, FText txt, bool visible = true);
 protected:
 	UUserWidget *RootWidget;
 	int DlgIndex;
 
-	UButton* InitButton(const char *name, FText txt, bool visible = true);
+	float AutoCloseTimeLeft;
 
 	virtual void Tick(float DeltaTime);
 };
