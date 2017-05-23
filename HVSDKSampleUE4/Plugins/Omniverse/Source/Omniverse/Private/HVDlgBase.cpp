@@ -32,6 +32,10 @@ AHVDlgBase::AHVDlgBase(const FObjectInitializer& ObjectInitializer)
 	
 	SetTickGroup(ETickingGroup::TG_LastDemotable);
 	SetActorRelativeScale3D(FVector(0.25f, 0.25f, 0.25f));
+
+	static ConstructorHelpers::FObjectFinder<UClass> dummy_prompt_for_package_bp(TEXT("Class'/Omniverse/HvSDK/Prompt.Prompt_C'"));
+	if (dummy_prompt_for_package_bp.Object) {
+	}
 }
 
 void AHVDlgBase::BeginPlay()

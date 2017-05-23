@@ -55,7 +55,7 @@ AHVRayActor::~AHVRayActor()
 	UHvInterface::OnRayActorDestroyed();
 }
 
-#define LINE_WEIGHT 1.5f
+#define LINE_WEIGHT 0.5f
 
 void AHVRayActor::DrawLine(UCustomMeshComponent *CustoemMesh, float Distance, bool ShowHit)
 {
