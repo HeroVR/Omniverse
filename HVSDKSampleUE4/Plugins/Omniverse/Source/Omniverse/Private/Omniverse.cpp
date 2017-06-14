@@ -8,6 +8,9 @@
 // #include "hidapi.h"
 
 #define LOCTEXT_NAMESPACE "FOmniverseModule"
+#define DeviceArrival 0x8000
+#define DeviceChanged 0x0007
+
 
 
 #if PLATFORM_WINDOWS
@@ -87,6 +90,36 @@ TSharedPtr<class IInputDevice> FOmniverseModule::CreateInputDevice(const TShared
 	OmniInputDevice = MakeShareable(new FOmniInputDevice(InMessageHandler));
 	return TSharedPtr< class IInputDevice >(OmniInputDevice);
 
+}
+
+
+bool FWindowsHandler::ProcessMessage(HWND Hwnd, uint32 Message, WPARAM WParam, LPARAM LParam, int32& OutResult)
+{
+	if (Message == 0x0219)
+	{
+		switch ((int32)WParam)
+		{
+		case DeviceArrival: //0x8000
+		case DeviceChanged: //0x0007
+		{
+			FOmniverseModule ref = FOmniverseModule::Get();
+			if (ref.OmniInputDevice->tryingToReconnectOmni)
+				return true;
+
+			if (!ref.OmniInputDevice->OmniDisconnected)
+				return true;
+
+			if (ref.OmniInputDevice->tickerLoops >= 3)
+				ref.OmniInputDevice->Init();
+
+			return true;
+		}
+		default:
+			return false;
+		}
+	}
+
+	return false;
 }
 
 #undef LOCTEXT_NAMESPACE
