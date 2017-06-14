@@ -4,7 +4,21 @@
 
 #include "ModuleManager.h"
 #include "IInputDeviceModule.h"
+#include "WindowsApplication.h"
 //#include "OmniInputDevice.h"
+
+
+class FWindowsHandler
+	: public IWindowsMessageHandler
+{
+public:
+
+	//~ IWindowsMessageHandler interface
+
+	virtual bool ProcessMessage(HWND Hwnd, uint32 Message, WPARAM WParam, LPARAM LParam, int32& OutResult) override;
+
+};
+
 
 class FOmniInputDevice;
 
@@ -32,5 +46,8 @@ public:
 		return FModuleManager::Get().IsModuleLoaded("Omniverse");
 	}
 
+private:
+
+	FWindowsHandler Handler;
 
 };
