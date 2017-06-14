@@ -187,6 +187,7 @@ http://web2d.vr.yingxiong.com/gateway/check_user?gameid=1&qrcode=190f00f16809e01
 |sign|string(64)|yes|Signature string for vertification of this call|
 |signtype|string(10)|no|Should be MD5|
 |qrcode|string(50)|yes|Omniverse internal trade number|
+
 The return result is in json format:
 |Result parameter|Type|Required|Description|
 |-|-|-|-|
