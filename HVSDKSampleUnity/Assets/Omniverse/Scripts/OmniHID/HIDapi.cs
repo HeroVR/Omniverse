@@ -75,4 +75,20 @@ struct hid_device_info
     public ushort usage;
     public int interface_number;
     public IntPtr next;
+
+    hid_device_info(int param = 0)
+    {
+        path = "";
+        vendor_id = 0;
+        product_id = 0;
+        serial_number = "";
+        release_number = 0;
+        manufacturer_string = "";
+        product_string = "";
+        usage_page = 0;
+        usage = 0;
+        interface_number = 0;
+        next = IntPtr.Zero;
+    }
 }
+

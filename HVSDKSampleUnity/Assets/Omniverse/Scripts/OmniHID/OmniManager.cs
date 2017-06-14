@@ -110,9 +110,7 @@ public class OmniManager
             Cleanup();
         }
 
-
-        //if (inputBuf[1] == 26)
-        if (inputBuf[2] == 156) // hex 9C
+        if (inputBuf[2] == 169) // hex A9
         {
             packet = new byte[inputBuf[1]];
             Buffer.BlockCopy(inputBuf, 0, packet, 0, inputBuf[1]);
@@ -120,9 +118,6 @@ public class OmniManager
         {
             return -2; //pods off or write data
         }
-
-
-        //Debug.Log(inputBuf[2].ToString());
 
         return inputBuf[1];
     }
