@@ -7,7 +7,7 @@
 
 // Sets default values for this component's properties
 UOmniControllerComponent::UOmniControllerComponent()
-	:CouplingPercentage(0)
+	:CouplingPercentage(1)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -53,6 +53,8 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 			{
 				// Raw yaw -> Game world yaw.
 				UOmniControllerPluginFunctionLibrary::GetYaw(RawOmniYaw);
+
+				//UHvInterface::getOmniYawOffset();
 
 				if (RawOmniYaw > 180) {
 					OmniYaw = RawOmniYaw - 360 - OmniYawOffset;
