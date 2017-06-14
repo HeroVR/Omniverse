@@ -604,32 +604,30 @@ public class HVSDK : MonoBehaviour
 
 	public static void CheckOmniViveAvailable(bool bSwitchToDevModeIfNA = true)
     {
-        OmniController omni_controller = null;
+        OmniMovementComponent omniMovementComponent = null;
         if (!VRSettings.enabled && bSwitchToDevModeIfNA)
         {
-            omni_controller = GameObject.FindObjectOfType<SteamVROmniController>();
-            if (omni_controller)
+            omniMovementComponent = GameObject.FindObjectOfType<SteamVROmniMovementComponent>();
+            if (omniMovementComponent)
             {
                 Debug.Log("[CheckOmniViveAvailable]Vive(N/A), Omni("
-                    + (omni_controller.omniFound ? "Found" : "N/A")
+                    + (omniMovementComponent.omniFound ? "Found" : "N/A")
                     + ") switch to dev-mode.");
-                //Vector3 v3 = omni_controller.transform.position;
-                //Quaternion qu = omni_controller.transform.rotation;
+                //Vector3 v3 = omniMovementComponent.transform.position;
+                //Quaternion qu = omniMovementComponent.transform.rotation;
 
-                omni_controller.developerMode = true;
-                omni_controller.OmniInitialize();
             }
         }
 
-		/*
-        if (null == omni_controller)
+        /*
+        if (null == omniMovementComponent)
         {
-            omni_controller = GameObject.FindObjectOfType<SteamVROmniController>();
+            omniMovementComponent = GameObject.FindObjectOfType<SteamVROmniMovementComponent>();
         }
 
-        if (omni_controller)
+        if (omniMovementComponent)
         {
-            Transform steam_camera_rig_offset = omni_controller.transform.Find("ViveSetupCameraRigParent/ViveSetupCameraRigRootOffset");
+            Transform steam_camera_rig_offset = omniMovementComponent.transform.Find("ViveSetupCameraRigParent/ViveSetupCameraRigRootOffset");
             if (steam_camera_rig_offset)
             {
               //  steam_camera_rig_offset.localPosition = Vector3.zero;
@@ -637,12 +635,12 @@ public class HVSDK : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.D))
             {
-                omni_controller.developerMode = true;
-                Debug.Log("not Found omni to set developerMode"+ omni_controller.developerMode);
+                omniMovementComponent.developerMode = true;
+                Debug.Log("not Found omni to set developerMode"+ omniMovementComponent.developerMode);
             }
             else
             {
-                omni_controller.developerMode = false;
+                omniMovementComponent.developerMode = false;
             }
         }
 		*/
