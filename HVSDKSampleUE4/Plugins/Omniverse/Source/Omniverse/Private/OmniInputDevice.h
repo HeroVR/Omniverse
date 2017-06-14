@@ -56,11 +56,16 @@ public:
 
 	struct hid_device_info *omni_dev;
 
+	bool OmniDisconnected;
+	bool tryingToReconnectOmni;
+
+	int32 NumFailedPackagesBeforeReconnect;
+
 	FOmniInputDevice(const TSharedRef< FGenericApplicationMessageHandler >& InMessageHandler);
 	~FOmniInputDevice();
 
 	static void PreInit();
-	void Init();
+	void Init(bool StartUpCall = false);
 
 	/** Tick the interface (e.g. check for new controllers) */
 	virtual void Tick(float DeltaTime) override;
@@ -80,7 +85,37 @@ public:
 
 	bool CheckForOmniVersion(struct hid_device_info& cur_dev, char *path, char *OmniType);
 
+	bool AttemptToReconnect(float param = 0)
+	{
+		tickerAdded = true;
+		tickerTicking = true;
+
+		if (OmniDisconnected && !tryingToReconnectOmni && (tickerLoops < 3))
+		{
+			Init();
+			tickerLoops++;
+		}
+		else if (!OmniDisconnected || tickerLoops >= 3)
+		{
+			Ticker.GetCoreTicker().RemoveTicker(AttemptToReconnectTheOmni_Handle);
+			tickerAdded = false;
+			tickerTicking = false;
+		}
+
+		return true;
+	}
+
+	bool tickerTicking;
+	int32 tickerLoops;
+	bool tickerAdded;
+
+
 private:
 	/* Message handler */
 	TSharedRef<FGenericApplicationMessageHandler> MessageHandler;
+
+	FDelegateHandle AttemptToReconnectTheOmni_Handle;
+
+	FTicker Ticker;
+
 };
