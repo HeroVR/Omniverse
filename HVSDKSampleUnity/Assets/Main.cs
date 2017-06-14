@@ -38,15 +38,6 @@ public class Main : MonoBehaviour {
         HVSDK.CheckOmniViveAvailable();
 //#endif
 
-		// use Omni decoupled-mode;
-		OmniController omni_controller = GameObject.FindObjectOfType<OmniController>();
-        if (omni_controller)
-        {
-            omni_controller.AlignOmni();
-            omni_controller.couplingPercentage = omni_controller.developerMode ? 1 : 0;
-            omni_controller.omniOffset = HVSDK.HvGetOmniYawOffset();
-        }
-
         // buttons in sample-scene
         HVSDK._ControllerRay.CheckShow(1);
 
