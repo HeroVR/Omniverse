@@ -10,10 +10,24 @@ const FKey EOmniKeys::OmniInputX("OmniXAxis");
 const FKey EOmniKeys::OmniInputY("OmniYAxis");
 const FKey EOmniKeys::OmniInputYaw("OmniYaw");
 
+int32 failedPackagesNum = 0;
 
 
 FOmniInputDevice::FOmniInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler) : MessageHandler(InMessageHandler)
 {
+	UE_LOG(LogTemp, Warning, TEXT("----------Current SDK Version - v1.4----------"));
+
+	OmniHandle = nullptr;
+	OmniDisconnected = true;
+	tryingToReconnectOmni = false;
+	NumFailedPackagesBeforeReconnect = 10;
+	tickerAdded = false;
+	tickerLoops = 0;
+
+	AttemptToReconnectTheOmni_Handle = FDelegateHandle::FDelegateHandle();
+
+	Ticker = FTicker::FTicker();
+
 	PreInit();
 	Init();
 }
@@ -22,7 +36,11 @@ FOmniInputDevice::~FOmniInputDevice()
 {
 	bInitializationSucceeded = false;
 
-	hid_exit();
+	if (OmniHandle != nullptr)
+	{
+		hid_close(OmniHandle);
+		hid_exit();
+	}
 }
 
 void FOmniInputDevice::PreInit()
@@ -38,19 +56,43 @@ void FOmniInputDevice::PreInit()
 	UE_LOG(LogTemp, Warning, TEXT("OmniInputDevice pre-init called"));
 }
 
-void FOmniInputDevice::Init()
+void FOmniInputDevice::Init(bool StartUpCall)
 {
+	tryingToReconnectOmni = true;
 	bool bFoundHIDDevice = false;
 	// Enumerate and print the HID devices on the system
 	struct hid_device_info *devs, *cur_dev;
 	FString serialNumber;
 	FString path;
 	devs = hid_enumerate(0x0, 0x0);
-	if (devs)
+	cur_dev = devs;
+
+	if (devs == NULL)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("No HID Devices detected."));
+		hid_exit();
+		tryingToReconnectOmni = false;
+		if (!tickerAdded)
+			AttemptToReconnectTheOmni_Handle = Ticker.GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &FOmniInputDevice::AttemptToReconnect), 0.5f);
+		return;
+	}
+
+
+	if (CheckForOmniVersion(*cur_dev, cur_dev->path, "mi_04"))
+	{
+		serialNumber = cur_dev->serial_number;
+		path = cur_dev->path;
+		omni_dev = cur_dev;
+
+		OmniHandle = hid_open_path(cur_dev->path);
+		bFoundHIDDevice = true;
+	}
+	else
+	{
+		devs = hid_enumerate(0x0, 0x0);
 		cur_dev = devs;
 
-		if (CheckForOmniVersion(*cur_dev, cur_dev->path, "mi_04"))
+		if (CheckForOmniVersion(*cur_dev, cur_dev->path, "mi_00"))
 		{
 			serialNumber = cur_dev->serial_number;
 			path = cur_dev->path;
@@ -59,50 +101,45 @@ void FOmniInputDevice::Init()
 			OmniHandle = hid_open_path(cur_dev->path);
 			bFoundHIDDevice = true;
 		}
-		else
-		{
-			devs = hid_enumerate(0x0, 0x0);
-			cur_dev = devs;
-
-			if (CheckForOmniVersion(*cur_dev, cur_dev->path, "mi_00"))
-			{
-				serialNumber = cur_dev->serial_number;
-				path = cur_dev->path;
-				omni_dev = cur_dev;
-
-				OmniHandle = hid_open_path(cur_dev->path);
-				bFoundHIDDevice = true;
-			}
-		}
-	}	
+	}
 
 	if (bFoundHIDDevice)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Omni Found"));
 		hid_free_enumeration(devs);
+
+		if (!OmniDisconnected)
+		{
+			tryingToReconnectOmni = false;
+			Ticker.RemoveTicker(AttemptToReconnectTheOmni_Handle);
+			tickerAdded = false;
+			tickerLoops = 0;
+			return;
+		}
 
 		// Set the hid_read() function to be non-blocking.
 		hid_set_nonblocking(OmniHandle, 1);
 
-		uint8 initialDataBuffer[65] = { 0 };
-		uint8 logAllData[] = { 0xEF, 0x09, 0x93, 0x00, 0x00, 0x7F, 0x94, 0xA5, 0xBE };
-		//CRC and settings for grabbing all data but step trigger and gun buttons
-		uint8 logNoGunNoTrigger[] = { 0xEF, 0x09, 0x93, 0x00, 0x00, 0x1F, 0x94, 0x8D, 0xBE };
-
-		initialDataBuffer[0] = 0;
-		//memcpy(&initialDataBuffer[1], logAllData, 9);
-		memcpy(&initialDataBuffer[1], logNoGunNoTrigger, 9);
-
-		uint8 zeroByte = 0;
-
-		hid_write(OmniHandle, initialDataBuffer, 65);
+		//hid_write(OmniHandle, initialDataBuffer, 65);
 		bResetStepCount = true;
 		bInitializationSucceeded = true;
+		OmniDisconnected = false;
+		tryingToReconnectOmni = false;
+		tickerLoops = 0;
 		UE_LOG(LogTemp, Warning, TEXT("Omni Found"));
+
+		if (StartUpCall && !tickerAdded)
+			AttemptToReconnectTheOmni_Handle = Ticker.GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &FOmniInputDevice::AttemptToReconnect), 0.5f);
+
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Omni Not Found"));
+		tryingToReconnectOmni = false;
+
+		if (!tickerAdded)
+			AttemptToReconnectTheOmni_Handle = Ticker.GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &FOmniInputDevice::AttemptToReconnect), 0.5f);
 	}
+
+	tryingToReconnectOmni = false;
 }
 
 void FOmniInputDevice::Tick(float DeltaTime)
@@ -122,25 +159,72 @@ void FOmniInputDevice::SendControllerEvents()
 	OmniTimeStamp = 0.f;
 
 	OmniInputBuffer[0] = 0;
-	hid_read(OmniHandle, OmniInputBuffer, 65);
 
-	Omni_Internal_Motion.Timestamp = *(int *)&OmniInputBuffer[6 + 0];
-	Omni_Internal_Motion.StepCount = *(int *)&OmniInputBuffer[6 + 4];
+	if (OmniDisconnected)
+	{
+		MessageHandler->OnControllerAnalog("OmniYaw", 0, OmniYaw);
+		MessageHandler->OnControllerAnalog("OmniXAxis", 0, XAxis);
+		MessageHandler->OnControllerAnalog("OmniYAxis", 0, YAxis);
 
-	OmniU.b[0] = OmniInputBuffer[6 + 8];
-	OmniU.b[1] = OmniInputBuffer[6 + 9];
-	OmniU.b[2] = OmniInputBuffer[6 + 10];
-	OmniU.b[3] = OmniInputBuffer[6 + 11];
+		UE_LOG(LogTemp, Warning, TEXT("Input zeroed out. Omni not connected."));
+		return;
+	}
+
+	int32 readResult = hid_read(OmniHandle, OmniInputBuffer, 65);
+
+	if (readResult == -1 || (OmniInputBuffer[0] != 0xEF && !OmniDisconnected) || (!OmniDisconnected && OmniInputBuffer[2] != 0xA9))	//Checking for Invalid Message
+	{
+		failedPackagesNum++;
+		UE_LOG(LogTemp, Warning, TEXT("Number of Failed Omni Packages: %i"), failedPackagesNum);
+
+		MessageHandler->OnControllerAnalog("OmniYaw", 0, OmniYaw);
+		MessageHandler->OnControllerAnalog("OmniXAxis", 0, XAxis);
+		MessageHandler->OnControllerAnalog("OmniYAxis", 0, YAxis);
+
+		if (failedPackagesNum >= NumFailedPackagesBeforeReconnect)
+		{
+			failedPackagesNum = 0;
+			OmniDisconnected = true;
+			hid_close(OmniHandle);
+
+			if (!tickerAdded)
+				AttemptToReconnectTheOmni_Handle = Ticker.GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &FOmniInputDevice::AttemptToReconnect), 0.5f);
+		}
+
+		UE_LOG(LogTemp, Error, TEXT("Omni is NOT receiving Input! Please make sure the Omni is connected and powered on!"));
+		return;
+	}
+
+
+	/* PAYLOAD DEFINITION:
+	* Start at index 5 for most things:
+	byte[0-3] = Timestamp (uint32)
+	byte[4-7] = Step Count (uint32)
+	byte[8-11] = Ring Angle (float32)
+	byte[12] = Ring Delta (1 byte)
+	byte[13-14] = Gamepad Data (2 bytes)
+	byte[15] = L/R Step Trigger (1 byte)
+	byte[16-23] = Pod 1 Quaternions (8 bytes, 2 bytes per)
+	byte[24-29] = Pod 1 Accelerometer (6 bytes, 2 bytes per)
+	byte[30-35] = Pod 1 Gyroscope (6 bytes, 2 bytes per)
+	byte[36-43] = Pod 2 Quaternions (8 bytes, 2 bytes per)
+	byte[44-49] = Pod 2 Accelerometer (6 bytes, 2 bytes per)
+	byte[50-55] = Pod 2 Gyroscope (6 bytes, 2 bytes per)
+	*/
+
+	Omni_Internal_Motion.Timestamp = *(int *)&OmniInputBuffer[5 + 0];
+	Omni_Internal_Motion.StepCount = *(int *)&OmniInputBuffer[5 + 4];
+
+	OmniU.b[0] = OmniInputBuffer[5 + 8];
+	OmniU.b[1] = OmniInputBuffer[5 + 9];
+	OmniU.b[2] = OmniInputBuffer[5 + 10];
+	OmniU.b[3] = OmniInputBuffer[5 + 11];
 
 	Omni_Internal_Motion.RingAngle = OmniU.f;
 
-	Omni_Internal_Motion.RingDelta = OmniInputBuffer[6 + 12];
-	Omni_Internal_Motion.GameX = OmniInputBuffer[6 + 13];
-	Omni_Internal_Motion.GameY = OmniInputBuffer[6 + 14];
-	//Omni_Internal_Motion.GunButtons = OmniInputBuffer[6 + 15]; No longer polling for this data
-	//Omni_Internal_Motion.StepTrigger = OmniInputBuffer[6 + 16];
-
-
+	Omni_Internal_Motion.RingDelta = OmniInputBuffer[5 + 12];
+	Omni_Internal_Motion.GameX = OmniInputBuffer[5 + 13];
+	Omni_Internal_Motion.GameY = OmniInputBuffer[5 + 14];
 
 	if (iCurrentTimeArrayIdx < 3)
 	{
