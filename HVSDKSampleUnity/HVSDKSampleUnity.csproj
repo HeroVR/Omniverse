@@ -87,6 +87,7 @@
     <Compile Include="Assets\Omniverse\Scripts\OmniHID\HIDapi.cs" />
     <Compile Include="Assets\Omniverse\Scripts\OmniHID\OmniManager.cs" />
     <Compile Include="Assets\Omniverse\Scripts\OmniMovementComponent.cs" />
+    <Compile Include="Assets\Omniverse\Scripts\SetOmniConnectGamepadMode.cs" />
     <Compile Include="Assets\Omniverse\Scripts\SmoothMouseLook.cs" />
     <Compile Include="Assets\Omniverse\Scripts\SteamVROmniController_Example.cs" />
     <Compile Include="Assets\Omniverse\Scripts\SteamVROmniMovementComponent.cs" />
