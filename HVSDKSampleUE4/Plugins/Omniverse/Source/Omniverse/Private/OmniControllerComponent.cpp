@@ -18,6 +18,7 @@ UOmniControllerComponent::UOmniControllerComponent()
 	bAutoCorrectStartYaw = true;
 	bStartYawCorrected = false;
 	StartYawDiff = 0;
+	BackwardMovementMod = 0.75f;
 }
 
 // Called every frame
