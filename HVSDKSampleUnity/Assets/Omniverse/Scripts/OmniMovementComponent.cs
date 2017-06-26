@@ -56,8 +56,6 @@ public class OmniMovementComponent : MonoBehaviour {
     //Has the Omni been found, and has it Calibrated
     [HideInInspector]
     public bool omniFound = false;
-    [HideInInspector]
-    public bool calibrationSuccessful;
 
 
     [Header("-----GameObject References-----")]
@@ -401,23 +399,6 @@ public class OmniMovementComponent : MonoBehaviour {
         hidInput.x = inputX;
     }
 
-    /// <summary>
-    /// This is called when user hits calibate key.
-    /// This is to setup the orientation of the Omni to match the HMD.
-    /// In basic version we just clear the alignment and then the next
-    /// loop it is aligned by the Align function.
-    /// </summary>
-    public virtual void Calibrate()
-    {
-        calibrationSuccessful = false;
-        if (motionData != null)
-        {
-            Debug.Log(System.DateTime.Now.ToLongTimeString() + ": OmniController(Calibrate) - Calibrating player's forward direction");
-            //Will align to correct calibration next time it hits align;
-            hasAligned = false;
-            calibrationSuccessful = true;
-        }
-    }
 
     /// <summary>
     /// Updates step count from motion data after getting the initial step count in the align.

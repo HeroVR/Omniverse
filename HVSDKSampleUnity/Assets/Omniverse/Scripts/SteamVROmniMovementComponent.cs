@@ -82,11 +82,12 @@ namespace Virtuix
                             transform.rotation = dummyObject.transform.rotation;
                         }
                         //locally store the offset value
-                        cameraOffset = HVSDK.HvGetOmniYawOffset();
+                        //cameraOffset = HVSDK.HvGetOmniYawOffset();
+                        cameraOffset = motionData.RingAngle;
                         omniOffset = motionData.RingAngle;
                         viveParentObject.rotation = Quaternion.Euler(0, cameraOffset - motionData.RingAngle + initialRotation, 0);
                         hasAligned = true;
-                        }
+                    }
                 }
 
                 if (!hasFullyInitialized && hasAligned)
