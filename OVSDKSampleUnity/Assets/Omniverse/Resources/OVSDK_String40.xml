@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<r id="Wait" str="请稍等..."/>
+	<r id="Close" str="关闭"/>
+	<r id="Yes" str="是的"/>
+	<r id="No" str="不是"/>
+	<r id="OK" str="确定"/>
+	<r id="Cancel" str="取消"/>
+	<r id="Bye" str="再见！"/>
+	<r id="Purchase" str="购买"/>
+	<r id="PurchaseGuest" str="游客模式下，不能进行购买！"/>
+	<r id="PurchaseSuccess" str="购买成功！ 订单号：&#13;&lt;color=#00FF00&gt;{0}&lt;/color&gt;"/>
+	<r id="PurchaseFailed" str="购买失败！&#13;&lt;color=#FF0000&gt;({0})&lt;/color&gt;"/>
+	<r id="PurchaseConnectFailed" str="购买失败，&#13;连接服务器错误！&#13;&lt;color=#00FF00&gt;({0})&lt;/color&gt;"/>
+	<r id="PurchaseConfirm" str="您正在购买 [&#13;&lt;color=#00FF00&gt;{0}&lt;/color&gt;], &#13;售价: &#13;&lt;color=#00FF00&gt;{1}&lt;/color&gt;，&#13;您确认购买么？"/>
+	<r id="Resume" str="再玩一局"/>
+	<r id="ResumeError" str="您余额不足，也没剩票，不能继续，再见！"/>
+	<r id="ResumeConfirm" str="您的充值余额: &lt;color=#00FF00&gt;{0}&lt;/color&gt;&#13;您剩余同样的游戏票数: &lt;color=#00FF00&gt;{1}&lt;/color&gt;&#13;继续游戏优先使用剩余同类型游戏票，否则使用余额购票并继续游戏。"/>
+	<r id="ResumeYes" str="继续游戏"/>
+	<r id="ResumeNo" str="退出游戏"/>
+	<r id="ResumeSuccess" str="继续游戏成功！"/>
+	<r id="ResumeFailed" str="继续游戏失败！&#13;&lt;color=#FF0000&gt;（{0}）&lt;/color&gt;"/>
+	<r id="SaveGameGuest" str="不能存档游客的游戏数据！"/>
+</root>

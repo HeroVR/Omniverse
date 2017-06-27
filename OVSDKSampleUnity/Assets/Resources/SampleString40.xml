@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<r id="WaitInit" str="正在初始化OVSDK..."/>
+	<r id="PrepareStage" str="准备阶段"/>
+	<r id="PrepareConfirm" str="此阶段不计入游戏时长，计时结束或关闭此对话框，则正式进行游戏并计费。"/>
+	<r id="PrepareEnd" str="现在强制接入计费阶段!"/>
+	<r id="InitResult" str="初始化结果"/>
+</root>

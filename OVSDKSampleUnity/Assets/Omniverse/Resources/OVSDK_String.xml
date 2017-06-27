@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<r id="Wait" str="Please standby..."/>
+	<r id="Close" str="Close"/>
+	<r id="Yes" str="Yes"/>
+	<r id="No" str="No"/>
+	<r id="OK" str="OK"/>
+	<r id="Cancel" str="Cancel"/>
+	<r id="Bye" str="Bye！"/>
+	<r id="Purchase" str="Purchase"/>
+	<r id="PurchaseGuest" str="Can't do purchase as a guest."/>
+	<r id="PurchaseSuccess" str="Purchase success! OrderNo.&#13;&lt;color=#00FF00&gt;{0}&lt;/color&gt;"/>
+	<r id="PurchaseFailed" str="Purchase failed! &#13;&lt;color=#FF0000&gt;({0})&lt;/color&gt;"/>
+	<r id="PurchaseConnectFailed" str="Purchase failed,&#13;Error occured when connect server!&#13;&lt;color=#FF0000&gt;({0})&lt;/color&gt;"/>
+	<r id="PurchaseConfirm" str="Purchasing [&lt;color=#00FF00&gt;{0}&lt;/color&gt;],&#13;Cost: &#13;&lt;color=#00FF00&gt;{1}&lt;/color&gt;,&#13;&#13;Are you sure?"/>
+	<r id="Resume" str="Resume Game"/>
+	<r id="ResumeError" str="No points, no same-game tickets, Bye!"/>
+	<r id="ResumeConfirm" str="Your points: &lt;color=#00FF00&gt;{0}&lt;/color&gt;&#13;Same-game tickets: &lt;color=#00FF00&gt;{1}&lt;/color&gt;&#13;Resume game will cost same-game tickets, otherwise cost points."/>
+	<r id="ResumeYes" str="Resume"/>
+	<r id="ResumeNo" str="Quit!"/>
+	<r id="ResumeSuccess" str="Resume success!"/>
+	<r id="ResumeFailed" str="Resume failed!&#13;&lt;color=#FF0000&gt;（{0}）&lt;/color&gt;"/>
+	<r id="SaveGameGuest" str="Can't save game for a guest."/>
+</root>
