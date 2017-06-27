@@ -172,7 +172,7 @@ void FOmniInputDevice::SendControllerEvents()
 
 	int32 readResult = hid_read(OmniHandle, OmniInputBuffer, 65);
 
-	if (readResult == -1 || (OmniInputBuffer[0] != 0xEF && !OmniDisconnected) || (!OmniDisconnected && OmniInputBuffer[2] != 0xA9))	//Checking for Invalid Message
+	if (readResult == -1)
 	{
 		failedPackagesNum++;
 		UE_LOG(LogTemp, Warning, TEXT("Number of Failed Omni Packages: %i"), failedPackagesNum);
@@ -195,6 +195,18 @@ void FOmniInputDevice::SendControllerEvents()
 		return;
 	}
 
+
+	//Data is not valid, but we don't want to disconnect the Omni. (Generally occurs when PODs are not streaming)
+	if((OmniInputBuffer[0] != 0xEF && !OmniDisconnected) || (!OmniDisconnected && OmniInputBuffer[2] != 0xA9))	//Checking for Invalid Message
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to Read HID Data. Please make sure the PODs are streaming."));
+
+		MessageHandler->OnControllerAnalog("OmniYaw", 0, OmniYaw);
+		MessageHandler->OnControllerAnalog("OmniXAxis", 0, XAxis);
+		MessageHandler->OnControllerAnalog("OmniYAxis", 0, YAxis);
+
+		return;
+	}
 
 	/* PAYLOAD DEFINITION:
 	* Start at index 5 for most things:
