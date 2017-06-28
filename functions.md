@@ -46,7 +46,9 @@ struct IPCUser
    char sBillingMode[32];          //Ticket mode, "timing", "timingreal", "direct_game", "shiyu_coin", "game_auth", "timescount";
    Uint32 nUserProp;               //for internal usage;
    char sConsolePath[128];         //for internal usage;
-   char sReserved[68];             //for internal usage;
+   Sint32 nCoupleRate;             //for internal usage; Default Omni couple rate (0: decoupled, 10000: coupled)
+   Sint32 nUserCoupleRate;         //for internal usage; User customized Omni couple rate (0: not customized, use default value, 1: decoupled, 10001: coupled)
+   char sReserved[60];             //for internal usage;
    char sQrcode[64];               //The omniverse trade number for this game ticket;
    char sWeb2d[128];               //for internal usage;
    Uint32 nCurGameId;              //for internal usage;
@@ -80,7 +82,7 @@ IPCUser::sBillingMode meaning:
 ### float UOVInterface::GetOmniCalibrationOffset()
 > Return Omni yaw calibration result, refer OmniControllerComponent.cpp;
 ### float UOVInterface::GetOmniCoupleRate()
-> Return Omni couple/decouple rate, 0: fully coupled to camera, 10000: fully decoupled (follows torso/ring angle).
+> Return Omni couple/decouple rate, 0: fully coupled to camera, 1.0: fully decoupled (follows torso/ring angle).
 ### UOVInterface::MsgBox(...)
 > Popup a Message box always in front of the HDM, and a controller-ray will appear and can operate the Message box. The controller-ray use an UWidgetInteractionComponent, be sure not confict with you game.
 This function mainly internal used for Omniverse SDK.

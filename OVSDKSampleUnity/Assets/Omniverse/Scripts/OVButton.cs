@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using System;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using UnityEngine.EventSystems;
 
 public enum OVButtonState
 {
@@ -36,6 +37,7 @@ public class OVButton : MonoBehaviour
     //private GameObject GameControl;
     Collider _buttonCollider;
     public bool _isCheckBox;
+    public bool _isSlider;
 
     public bool _isChecked { get; set; }
 
@@ -60,6 +62,9 @@ public class OVButton : MonoBehaviour
         listener.onUp += this.onUp;
         listener.onDown += this.onDown;
         listener.onExit += this.onExit;
+
+        listener.onDrag += this.OnDrag;
+
         listener.onEnter += this.onEnter;
         if(_Buttontext != "" && OVSDK.HasInitialized())
         {
@@ -78,6 +83,10 @@ public class OVButton : MonoBehaviour
         listener.onDown -= this.onDown;
         listener.onExit -= this.onExit;
         listener.onEnter -= this.onEnter;
+        if (this._isSlider)
+        {
+            listener.onDrag -= this.OnDrag;
+        }
     }
 
     public void SetButtonState(OVButtonState state)
@@ -136,6 +145,36 @@ public class OVButton : MonoBehaviour
     {
      //   Debug.Log("onUp" + sender.name);
         this.SetButtonState(OVButtonState.Normal);
+    }
+    public virtual void OnDrag(GameObject sender, PointerEventData ped)
+    {
+        if(!this._isSlider)
+        {
+            return;
+        }
+        if(sender.gameObject)
+        {
+            Vector2 pos = ped.position;
+            RectTransform rect = this.transform as RectTransform;
+            Canvas ca = this.transform.root.GetComponentInChildren<Canvas>();
+			if (ca != null)
+			{
+				RectTransform canvasRect = ca.transform as RectTransform;
+
+				RectTransform sliderRect = rect.parent.parent.GetComponent<RectTransform>();
+				Vector2 dis = (pos + canvasRect.offsetMin) - sliderRect.anchoredPosition;
+				RectTransform areaRect = rect.parent.GetComponent<RectTransform>();
+				float w = sliderRect.sizeDelta.x + areaRect.sizeDelta.x;
+				if (dis.x < -w) {
+					dis.x = -w;
+				}
+				if (dis.x > w) {
+					dis.x = w;
+				}
+				float va = (dis.x + ((w) / 2)) / w;
+				sliderRect.GetComponent<Slider>().value = va;
+			}            
+        }
     }
     public virtual void onDown(GameObject sender)
     {

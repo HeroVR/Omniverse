@@ -5,7 +5,7 @@ using UnityEditor.UI;
 // Custom Editor the "old" way by modifying the script variables directly.
 // No handling of multi-object editing, undo, and prefab overrides!
 [CanEditMultipleObjects, CustomEditor(typeof(OVButton), true)]
-public class HVButtonEditor : SelectableEditor
+public class OVButtonEditor : SelectableEditor
 {
     private SerializedProperty m_OnClickProperty;
 
@@ -18,11 +18,13 @@ public class HVButtonEditor : SelectableEditor
     private SerializedProperty _CheckGameObject;
     private SerializedProperty _Checknormal;
     private SerializedProperty _Buttontext;
+    //private SerializedProperty _isSlider;
 
     [MenuItem("Examples/Editor GUILayout Toggle Usage")]
     protected override void OnEnable()
     {
-    //    this._isCheckBox = base.serializedObject.FindProperty("_isCheckBox");
+        //    this._isCheckBox = base.serializedObject.FindProperty("_isCheckBox");
+        //this._isSlider = base.serializedObject.FindProperty("_isSlider");
         this.m_OnClickProperty = base.serializedObject.FindProperty("m_OnClick");
         this._StyleNormal = base.serializedObject.FindProperty("_StyleNormal");
         this._StyleHover = base.serializedObject.FindProperty("_StyleHover");
@@ -37,6 +39,7 @@ public class HVButtonEditor : SelectableEditor
     public override void OnInspectorGUI()
     {
 		OVButton hb = (OVButton)target;
+        hb._isSlider = (bool)EditorGUILayout.Toggle("_isSlider", hb._isSlider);
         hb._isCheckBox = (bool)EditorGUILayout.Toggle("_isCheckBox", hb._isCheckBox);
         if(hb._isCheckBox)
         {

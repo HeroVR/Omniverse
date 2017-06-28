@@ -13,7 +13,7 @@ public class OVUIEventListener : MonoBehaviour
     public VoidDelegate onSelect;
     public VoidDelegate onUpdateSelect;
     public VoidDelegate onDeSelect;
-    public VoidDelegate onDrag;
+    public VectorDelegate onDrag;
     public VoidDelegate onDragEnd;
     public VoidDelegate onDrop;
     public VoidDelegate onScroll;
@@ -31,7 +31,7 @@ public class OVUIEventListener : MonoBehaviour
     public void OnSelect(BaseEventData eventData) { if (onSelect != null) onSelect(gameObject); }
     public void OnUpdateSelected(BaseEventData eventData) { if (onUpdateSelect != null) onUpdateSelect(gameObject); }
     public void OnDeselect(BaseEventData eventData) { if (onDeSelect != null) onDeSelect(gameObject); }
-    public void OnDrag(PointerEventData eventData) { if (onDrag != null) onDrag(gameObject); }
+    public void OnDrag(PointerEventData eventData) { if (onDrag != null) onDrag(gameObject, eventData); }
     public void OnEndDrag(PointerEventData eventData) { if (onDragEnd != null) onDragEnd(gameObject); }
     public void OnDrop(PointerEventData eventData) { if (onDrop != null) onDrop(gameObject); }
     public void OnScroll(PointerEventData eventData) { if (onScroll != null) onScroll(gameObject); }

@@ -320,13 +320,13 @@ public class OmniMovementComponent : MonoBehaviour {
             debugCounterForDataMessages++;
             if (debugCounterForDataMessages > 30)
             {
-                Debug.Log(System.DateTime.Now.ToLongTimeString() +
-                    ": Timestamp = " + motionData.Timestamp +
-                    "; Step count = " + motionData.StepCount +
-                    "; Ring Angle = " + motionData.RingAngle +
-                    "; Ring Delta = " + motionData.RingDelta +
-                    "; joy x = " + motionData.GamePad_X +
-                    "; joy y = " + motionData.GamePad_Y);
+               //Debug.Log(System.DateTime.Now.ToLongTimeString() +
+               //     ": Timestamp = " + motionData.Timestamp +
+               //     "; Step count = " + motionData.StepCount +
+               //     "; Ring Angle = " + motionData.RingAngle +
+               //     "; Ring Delta = " + motionData.RingDelta +
+               //     "; joy x = " + motionData.GamePad_X +
+               //     "; joy y = " + motionData.GamePad_Y);
                 debugCounterForDataMessages = 0;
             }
 
