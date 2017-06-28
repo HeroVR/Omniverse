@@ -165,17 +165,18 @@ public class OmniMovementComponent : MonoBehaviour {
     {
         float cameraYaw = cameraReference.rotation.eulerAngles.y;
         float adjustedOmniYaw = currentOmniYaw - omniOffset;
-        float angleBetweenOmniAndCamera = 0f;
-        angleBetweenOmniAndCamera = Mathf.Abs(cameraYaw - adjustedOmniYaw) % 360;
-        angleBetweenOmniAndCamera = angleBetweenOmniAndCamera > 180 ? 360 - angleBetweenOmniAndCamera : angleBetweenOmniAndCamera;
+        Debug.Log(cameraYaw + " - " + adjustedOmniYaw);
+        float angleBetweenControllerAndCamera = 0f;
+        angleBetweenControllerAndCamera = Mathf.Abs(cameraYaw - adjustedOmniYaw) % 360;
+        angleBetweenControllerAndCamera = angleBetweenControllerAndCamera > 180 ? 360 - angleBetweenControllerAndCamera : angleBetweenControllerAndCamera;
 
         //calculate sign
         float sign = (cameraYaw - adjustedOmniYaw >= 0 && cameraYaw - adjustedOmniYaw <= 180) ||
             (cameraYaw - adjustedOmniYaw <= -180 && cameraYaw - adjustedOmniYaw >= -360) ? 1 : -1;
 
-        angleBetweenOmniAndCamera *= sign;
+        angleBetweenControllerAndCamera *= sign;
 
-        return angleBetweenOmniAndCamera;
+        return angleBetweenControllerAndCamera;
     }
 
     //called on exit
@@ -422,7 +423,7 @@ public class OmniMovementComponent : MonoBehaviour {
                 if ((cameraReference.transform.position.x != 0) && (cameraReference.transform.position.y != 0) && (cameraReference.transform.position.z != 0) &&
                             (cameraReference.rotation.eulerAngles.x != 0) && (cameraReference.rotation.eulerAngles.y != 0) && (cameraReference.rotation.eulerAngles.z != 0))
                 {
-                    omniOffset = motionData.RingAngle - cameraReference.localRotation.eulerAngles.y;
+                    omniOffset = motionData.RingAngle - cameraReference.rotation.eulerAngles.y;
                     hasAligned = true;
                 }
                 if (!hasFullyInitialized)
@@ -451,6 +452,7 @@ public class OmniMovementComponent : MonoBehaviour {
 
         //calculate angle between camera and omni
         angleBetweenOmniAndCamera = ComputeAngleBetweenControllerAndCamera();
+        Debug.Log(angleBetweenOmniAndCamera);
 
         float forwardRotation = 0f;
 
