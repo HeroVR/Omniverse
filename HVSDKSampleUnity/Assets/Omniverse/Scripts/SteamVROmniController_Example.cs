@@ -11,8 +11,6 @@ using UnityEngine;
         2. Inside of your Character Controller Script, create an SteamVROmniMovementComponent variable and get the Reference to the Component on Start().
         3. Copy the UseOmniInputToMovePlayer() function to your Character Controller Script.
         4. Call the UseOmniInputToMovePlayer() function in your Character Controller Script's Update() function.
-        5. Uncomment Line 2 in the SteamVROmniMovementComponent Script.
-            b. Line 2 is a #define statement for SteamVR. If you don't uncomment this, then the component will not work.
 
 */
 

@@ -42,11 +42,7 @@ public class OmniMovementComponent : MonoBehaviour {
     [HideInInspector]
     public int currentStepCount;
     [HideInInspector]
-    public float cameraOffset = 0f;
-    [HideInInspector]
     public float omniOffset = 0f;
-    //[HideInInspector]
-    public float initialRotation = 0f;
     [HideInInspector]
     public float currentCameraRotation;
     [HideInInspector]
@@ -167,84 +163,19 @@ public class OmniMovementComponent : MonoBehaviour {
     //angle difference between camera and omni angle, used for decoupled effect
     protected float ComputeAngleBetweenControllerAndCamera()
     {
-
-        //float a = currentOmniYaw - omniOffset;
-        //float b = cameraReference.rotation.eulerAngles.y;
-        float a = cameraReference.rotation.eulerAngles.y;
-        float b = currentOmniYaw - omniOffset;
-        float d = 0f;
-        d = Mathf.Abs(a - b) % 360;
-        float r = d > 180 ? 360 - d : d;
+        float cameraYaw = cameraReference.rotation.eulerAngles.y;
+        float adjustedOmniYaw = currentOmniYaw - omniOffset;
+        float angleBetweenOmniAndCamera = 0f;
+        angleBetweenOmniAndCamera = Mathf.Abs(cameraYaw - adjustedOmniYaw) % 360;
+        angleBetweenOmniAndCamera = angleBetweenOmniAndCamera > 180 ? 360 - angleBetweenOmniAndCamera : angleBetweenOmniAndCamera;
 
         //calculate sign
-        float sign = (a - b >= 0 && a - b <= 180) ||
-            (a - b <= -180 && a - b >= -360) ? 1 : -1;
-        
-        r *= sign;
-        //r = r < 0 ? 360 + r : r;
-        return r;
+        float sign = (cameraYaw - adjustedOmniYaw >= 0 && cameraYaw - adjustedOmniYaw <= 180) ||
+            (cameraYaw - adjustedOmniYaw <= -180 && cameraYaw - adjustedOmniYaw >= -360) ? 1 : -1;
 
-        //float retVal = 0f;
-        //
-        //float forwardRotation = currentOmniYaw - omniOffset;
-        //Vector3 v = cameraReference.forward;
-        //Vector3 d = transform.forward;
-        //v.Normalize();
-        ////rotate forward vector around omni yaw
-        //d = Quaternion.Euler(0, forwardRotation, 0) * d;
-        //d.Normalize();
-        //
-        ////compute angle difference
-        //retVal = Mathf.Acos(Vector3.Dot(v, d));
-        //retVal = retVal * Mathf.Rad2Deg;
-        //float direction = Vector3.Dot(Vector3.Cross(v, d), Vector3.up);
-        //
-        //if (direction > 0)
-        //    retVal = -retVal;
-        //if (direction < 0)
-        //    retVal = Mathf.Abs(retVal);
-        //return retVal;
+        angleBetweenOmniAndCamera *= sign;
 
-
-        // float retVal = 0f;
-        //
-        // float forwardRotation = omniOffset - currentOmniYaw;
-        // Vector3 v = cameraReference.forward;
-        //float cameraYaw = cameraReference.rotation.eulerAngles.y;
-        ////Vector3 omniForward = Quaternion.Euler(0.0f, currentOmniYaw, 0.0f) * Vector3.forward;
-        ////retVal = Mathf.Acos(Vector3.Dot(v, omniForward));
-        //// retVal = retVal * Mathf.Rad2Deg;
-        //retVal = (currentOmniYaw - omniOffset) + cameraYaw;
-        //
-        //if (retVal >= 360.0f)
-        //    retVal -= 360.0f;
-        //else if(retVal <= 0)
-        //    retVal += 360.0f;
-        //
-        //return retVal;
-
-        //forwardRotation = currentOmniYaw + cameraYaw;
-        //
-        //return forwardRotation;
-
-
-        //Vector3 d = transform.forward;
-        //v.Normalize();
-
-        ////rotate forward vector around omni yaw
-        //d = Quaternion.Euler(0, forwardRotation, 0) * d;
-        //d.Normalize();
-
-        ////compute angle difference
-        //retVal = Mathf.Acos(Vector3.Dot(v, d));
-        //retVal = retVal * Mathf.Rad2Deg;
-        //float direction = Vector3.Dot(Vector3.Cross(v, d), Vector3.up);
-
-        //if (direction > 0)
-        //    retVal = -retVal;
-        //if (direction < 0)
-        //    retVal = Mathf.Abs(retVal);
-        //return retVal;
+        return angleBetweenOmniAndCamera;
     }
 
     //called on exit
@@ -375,6 +306,7 @@ public class OmniMovementComponent : MonoBehaviour {
 
         if (motionData != null)
         {
+            /*
             debugCounterForDataMessages++;
             if (debugCounterForDataMessages > 30)
             {
@@ -386,7 +318,7 @@ public class OmniMovementComponent : MonoBehaviour {
                     "; joy x = " + motionData.GamePad_X +
                     "; joy y = " + motionData.GamePad_Y);
                 debugCounterForDataMessages = 0;
-            }
+            }*/
 
             currentOmniYaw = motionData.RingAngle;
 
@@ -487,19 +419,12 @@ public class OmniMovementComponent : MonoBehaviour {
             //set offset to be current ring angle
             if (motionData != null)
             {
-                if (hasFullyInitialized)
+                if ((cameraReference.transform.position.x != 0) && (cameraReference.transform.position.y != 0) && (cameraReference.transform.position.z != 0) &&
+                            (cameraReference.rotation.eulerAngles.x != 0) && (cameraReference.rotation.eulerAngles.y != 0) && (cameraReference.rotation.eulerAngles.z != 0))
                 {
-                    //Finds the initial rotation of the Player
-                    initialRotation = dummyObject.transform.rotation.eulerAngles.y;
-
-                    //Sets the Player rotation to the rotation of the dummy object
-                    //transform.rotation = dummyObject.transform.rotation;
+                    omniOffset = motionData.RingAngle - cameraReference.localRotation.eulerAngles.y;
+                    hasAligned = true;
                 }
-                cameraOffset = motionData.RingAngle;
-                omniOffset = motionData.RingAngle;
-                InputTracking.Recenter();
-                OmniOffsetFromHMD = cameraReference.rotation.eulerAngles.y - motionData.RingAngle;
-                hasAligned = true;
                 if (!hasFullyInitialized)
                 {
                     //grab initial step count here

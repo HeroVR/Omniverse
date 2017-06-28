@@ -65,44 +65,5 @@ namespace Virtuix
             }
             
         }
-
-
-        public override void AlignOmni()
-        {
-            if (!hasAligned)
-            {
-                if (motionData != null)
-                {
-                    if ((cameraReference.transform.position.x != 0) && (cameraReference.transform.position.y != 0) && (cameraReference.transform.position.z != 0) &&
-                            (cameraReference.rotation.eulerAngles.x != 0) && (cameraReference.rotation.eulerAngles.y != 0) && (cameraReference.rotation.eulerAngles.z != 0))
-                    {
-                        if (hasFullyInitialized)
-                        {
-                            initialRotation = dummyObject.transform.rotation.eulerAngles.y;
-                            //transform.rotation = dummyObject.transform.rotation;    //To Be Removed
-                        }
-                        //locally store the offset value
-                        //cameraOffset = HVSDK.HvGetOmniYawOffset();
-                        //cameraOffset = PlayerPrefs.GetFloat("Vive_Offset");  //motionData.RingAngle - cameraReference.localRotation.eulerAngles.y;
-                        //cameraOffset = motionData.RingAngle;
-                        cameraOffset = motionData.RingAngle - cameraReference.localRotation.eulerAngles.y;
-                        //viveParentObject.rotation = Quaternion.Euler(0, cameraOffset - motionData.RingAngle + initialRotation, 0);
-                        omniOffset = motionData.RingAngle - cameraReference.localRotation.eulerAngles.y;
-                        hasAligned = true;
-                    }
-                }
-
-                if (!hasFullyInitialized && hasAligned)
-                {
-                    //grab initial step count here
-                    if (motionData != null)
-                    {
-                        ResetStepCount();
-                        hasFullyInitialized = true;
-                        Debug.Log(System.DateTime.Now.ToLongTimeString() + ": SteamVROmniMovementComponent(AlignOmni) - Successfully aligned Omni. Omni has been fully initialized");
-                    }
-                }
-            }
-        }
     }
 }
