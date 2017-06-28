@@ -44,12 +44,10 @@ public class OmniMovementComponent : MonoBehaviour {
     [HideInInspector]
     public float omniOffset = 0f;
     [HideInInspector]
-    public float currentCameraRotation;
-    [HideInInspector]
     public float angleBetweenOmniAndCamera;
 
 
-    //Has the Omni been found, and has it Calibrated
+    //Has the Omni been found
     [HideInInspector]
     public bool omniFound = false;
 
@@ -61,7 +59,7 @@ public class OmniMovementComponent : MonoBehaviour {
     protected Vector3 dummyForward;
 
     protected CharacterController characterController;
-    protected bool hasAligned = false;
+    protected bool hasCalibrated = false;
     protected int startingStepCount;
 
     protected OmniManager omniManager;
@@ -165,7 +163,6 @@ public class OmniMovementComponent : MonoBehaviour {
     {
         float cameraYaw = cameraReference.rotation.eulerAngles.y;
         float adjustedOmniYaw = currentOmniYaw - omniOffset;
-        Debug.Log(cameraYaw + " - " + adjustedOmniYaw);
         float angleBetweenControllerAndCamera = 0f;
         angleBetweenControllerAndCamera = Mathf.Abs(cameraYaw - adjustedOmniYaw) % 360;
         angleBetweenControllerAndCamera = angleBetweenControllerAndCamera > 180 ? 360 - angleBetweenControllerAndCamera : angleBetweenControllerAndCamera;
@@ -413,9 +410,9 @@ public class OmniMovementComponent : MonoBehaviour {
     /// <summary>
     /// Second half of Calibration. Sets up proper alignment between Omni and HMD based on Omni input data and HMD orientation.
     /// </summary>
-    public virtual void AlignOmni()
+    public virtual void CalbirateOmni()
     {
-        if (!hasAligned)
+        if (!hasCalibrated)
         {
             //set offset to be current ring angle
             if (motionData != null)
@@ -424,7 +421,7 @@ public class OmniMovementComponent : MonoBehaviour {
                             (cameraReference.rotation.eulerAngles.x != 0) && (cameraReference.rotation.eulerAngles.y != 0) && (cameraReference.rotation.eulerAngles.z != 0))
                 {
                     omniOffset = motionData.RingAngle - cameraReference.rotation.eulerAngles.y;
-                    hasAligned = true;
+                    hasCalibrated = true;
                 }
                 if (!hasFullyInitialized)
                 {
@@ -452,7 +449,6 @@ public class OmniMovementComponent : MonoBehaviour {
 
         //calculate angle between camera and omni
         angleBetweenOmniAndCamera = ComputeAngleBetweenControllerAndCamera();
-        Debug.Log(angleBetweenOmniAndCamera);
 
         float forwardRotation = 0f;
 
@@ -504,13 +500,7 @@ public class OmniMovementComponent : MonoBehaviour {
         if (!developerMode)
         {
             ReadOmniData();
-            AlignOmni();
-        }
-
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            hasAligned = false;
-            AlignOmni();
+            CalbirateOmni();
         }
     }
 

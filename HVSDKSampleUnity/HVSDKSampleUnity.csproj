@@ -89,8 +89,6 @@
     <Compile Include="Assets\Omniverse\Scripts\OmniMovementComponent.cs" />
     <Compile Include="Assets\Omniverse\Scripts\SetOmniConnectGamepadMode.cs" />
     <Compile Include="Assets\Omniverse\Scripts\SmoothMouseLook.cs" />
-    <Compile Include="Assets\Omniverse\Scripts\SteamVROmniController_Example.cs" />
-    <Compile Include="Assets\Omniverse\Scripts\SteamVROmniMovementComponent.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_GazeTracker.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_LaserPointer.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_Teleporter.cs" />
