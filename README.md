@@ -1,20 +1,33 @@
 ﻿# **Omniverse** #
-The repository is Omniverse SDK for Unity and UnrealEngine4. This document is edited by VSCode. You can open and preview this document by VSCode if there is any display error.
+The repository is Omniverse SDK for Unity and UnrealEngine4. This document is edited by VSCode. You can open and preview this document by VSCode if there is any display error.<p> To make the game support Omni, you should follow these steps:
+1. Contact Omniverse to create CP account;
+2. Active your Omni in develop enviroment; 
+3. Request GameID and GameKey;
+4. You should get Omniverse SDK, document, samples from github.com, get calibration app from Omniverse staff or CP backend;
+5. Calibrate each Omni by calibration app;
+6. Integrate Omniverse SDK to your game, steps are list below, functions not appeared in steps are optional;
+7. Test your game, steps are list below in this document;
+8. Commit your game to Omniverse staff;
+9. Publish your game by Omniverse;
+
+Currently, contact Omniverse staff to do step 1,2,3, later it can be done in CP backend. 
+
 **********************************************************************
 **********************************************************************
-# **Projects** #
+# **Sample Projects** #
 ## OVSDKSampleUE4 ##
-It's the sample for UE4 C++;
+It's the sample for UE4 C++. OVSDKSampleUE4\Plugins\Omniverse folder is the Omniverse plugin for UE4, you can copy it to your own game project.
 ## OVSDKSampleUE4BP ##
 It's the sample for UE4 Blueprint; In git repository, we keep one copy of Omniverse plugin to avoid confict. So you can make link Ominverse under OVSDKSampleUE4BP\Plugins to OVSDKSampleUE4\Plugins\Omniverse, like these (and make sure you got administrator privilege)  
 ``
 mklink /D Omniverse ..\..\OVSDKSampleUE4\Plugins\Omniverse
 ``
 ## OVSDKSampleUnity for Unity;
-It's the sample for unity, you can export unity plugin package here.
+It's the sample for unity, you can export unity plugin package here, then import to your game project.
 **********************************************************************
 **********************************************************************
-# **Usage** #
+# **Integrate Steps** #
+To integrate Ominiverse SDK, you must follow these steps. Other interface/functions not appeared here are optional, use or not is up to you.
 ## Use Omniverse SDK by UE4 C++ 
 1. Copy OVSDKSampleUE4/Plugins/Omniverse to your project's Plugins;
 2. Add plugins config to uproject:  
@@ -77,14 +90,17 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engi
 **********************************************************************
 **********************************************************************
 # **Testing** #
-- Press Ctrl + Alt + Shift + O in game, you should see an Omniverse pop-up message box;
-- Create a text file under Plugins\Omniverse\DLL\Win64(same as Omniverse.Functions.dll path), named as devenv.cfg. The text file's content sample is listed below.
+Create a text file under Plugins\Omniverse\DLL\Win64(same as Omniverse.Functions.dll path), named as devenv.cfg, then the game will run as develop mode in develop enviroment. <b>You must remove this file when pack to publish the game</b>. <p>The develop and retail enviroment are seperate. There have already many player accounts in develop env, you can use them. Omni is auto unlocked when game running in develop mode (This Omni must actived in develop env).
+- The text file devevn.cfg's content sample is listed below.
 The text file simulates the retail omniverse enviroment, you can modify user id, prepare-time (unit: seconds), game-time. After UOVInterface::HasInitialized return true, you can call UOVInterface::GetUserInfo() to get player's information.
 ```
 user=33
-preparetime=15
+preparetime=60
 billingmode=timing
-gametime=360
+gametime=600
 ```
+- Press Ctrl + Alt + Shift + O in game, you should see an Omniverse system-menu. 
+- You can modify couple/decouple percentage in Omniverse system-menu.
+
  
     
