@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
-
 /*
 
     To add Omni Movement to an existing Character, follow the steps outlined below:
@@ -13,15 +10,7 @@ using UnityEngine;
         3. Copy the UseOmniInputToMovePlayer() function to your Character Controller Script.
         4. Call the UseOmniInputToMovePlayer() function in your Character Controller Script's Update() function.
 
-
-    If you are using the Vive HMD then you will need to make a couple of changes:
-        1. The OmniMovementComponent variable will need to be a SteamVROmniMovementComponent variable instead.
-            a. Be sure to change the variable type in the GetComponent call on Start() as well.
-        2. Uncomment Line 2 in the SteamVROmniMovementComponent Script.
-            b. Line 2 is a #define statement for SteamVR. If you don't uncomment this, then the component will not work.
-
 */
-
 
 public class OmniController_Example : MonoBehaviour {
 

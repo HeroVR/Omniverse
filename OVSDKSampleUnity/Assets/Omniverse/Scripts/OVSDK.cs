@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System;
 using UnityEngine.UI;
-using Virtuix;
 using UnityEngine.VR;
 using System.Xml;
 using System.Collections.Generic;
@@ -582,7 +581,7 @@ public class OVSDK : MonoBehaviour
         OmniMovementComponent omniMovementComponent = null;
         if (bSwitchToDevModeIfNA)
         {
-            omniMovementComponent = GameObject.FindObjectOfType<SteamVROmniMovementComponent>();
+            omniMovementComponent = GameObject.FindObjectOfType<OmniMovementComponent>();
             if (omniMovementComponent)
             {
                 Debug.Log("[CheckOmniViveAvailable]Vive(N/A), Omni("

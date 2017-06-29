@@ -73,24 +73,6 @@ public class OmniManager
             HIDapi.hid_close(hidapi_handle);
     }
 
-    public int SendData(byte[] data)
-    {
-        if (hidapi_handle == IntPtr.Zero) return -2;
-
-        if (data.Length > 64) return -1;
-
-        Array.Clear(outputBuf, 0, 65);
-
-        outputBuf[0] = (byte)0x00; // Maybe change
-
-        Buffer.BlockCopy(data, 0, outputBuf, 1, data.Length);
-
-        int res = 0;
-        res = HIDapi.hid_write(hidapi_handle, outputBuf, new UIntPtr(Convert.ToUInt32(outputBuf.Length)));
-
-        return res;
-    }
-
     public int ReadData(ref byte[] packet) 
     {
         if (omniDisconnected)   //if disconnected, don't do anything
