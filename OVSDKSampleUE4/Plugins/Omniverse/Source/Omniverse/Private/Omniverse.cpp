@@ -15,9 +15,9 @@
 
 #if PLATFORM_WINDOWS
 #	if PLATFORM_64BITS
-#		define DESKTOP_PLUGIN_DLL	TEXT("Omniverse/DLL/Win64/desktop_plugin.dll")
+#		define DESKTOP_PLUGIN_DLL	TEXT("Omniverse/DLL/Win64/Omniverse.Functions.dll")
 #	else
-#		define DESKTOP_PLUGIN_DLL	TEXT("Omniverse/DLL/Win32/desktop_plugin.dll")
+#		define DESKTOP_PLUGIN_DLL	TEXT("Omniverse/DLL/Win32/Omniverse.Functions.dll")
 #	endif
 #else
 #      error Unsupported platform for OVSDK

@@ -270,7 +270,8 @@ public class OVMsgBoxMenu : OVMsgBox
 	OVMenuItem CreateItem(OVMenuItemDef def)
 	{
 		OVMenuItem item = null;
-		GameObject prefab = Resources.Load<GameObject>("OV" + def.type);
+		string prefab_file = "OV" + def.type;
+		GameObject prefab = Resources.Load<GameObject>(prefab_file);
 		if (prefab)
 		{
 			GameObject go = GameObject.Instantiate(prefab, _BG) as GameObject;

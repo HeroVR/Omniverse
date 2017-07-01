@@ -452,7 +452,7 @@ public class OmniMovementComponent : MonoBehaviour {
         if (currentOmniYaw < 0f) currentOmniYaw += 360f;
 
         //Get the coupling percentage from Omniverse
-        couplingPercentage = OVSDK.GetOmniCoupleRate();
+        couplingPercentage = developerMode ? 1.0f : OVSDK.GetOmniCoupleRate();
 
 
         //calculate forward rotation

@@ -95,12 +95,9 @@ Create a text file under Plugins\Omniverse\DLL\Win64(same as Omniverse.Functions
 The text file simulates the retail omniverse enviroment, you can modify user id, prepare-time (unit: seconds), game-time. After UOVInterface::HasInitialized return true, you can call UOVInterface::GetUserInfo() to get player's information.
 ```
 user=33
-preparetime=60
-billingmode=timing
 gametime=600
 ```
-- Press Ctrl + Alt + Shift + O in game, you should see an Omniverse system-menu. 
-- You can modify couple/decouple percentage in Omniverse system-menu.
-
- 
-    
+- Config different user in devenv.cfg to simulate different players;
+- Press Ctrl + Alt + Shift + O in game, you should see an Omniverse system-menu. (Make sure OVSDK.Init/UOVInterface::Init has called if system-menu not appeared)
+- Test moving in Omni, you can modify couple/decouple percentage in Omniverse system-menu.
+- Test other functions if you integrated.
