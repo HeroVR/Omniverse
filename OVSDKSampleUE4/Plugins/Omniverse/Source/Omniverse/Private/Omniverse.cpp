@@ -65,7 +65,7 @@ void FOmniverseModule::StartupModule()
 	}
 
 	if (NULL == funcInit) {
-		UE_LOG(LogTemp, Error, TEXT("OVSDK load desktop_plugin.dll failed!"));
+		UE_LOG(LogTemp, Error, TEXT("OVSDK load Omniverse.Functions.dll failed!"));
 	}
 }
 

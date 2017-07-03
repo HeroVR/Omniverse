@@ -18,6 +18,7 @@ struct OVMenuItemDef
 struct OVMenuDef
 {
 	public int x, y, w, h;
+	public string name;
 	public OVMenuItemDef[] items;
 }
 
@@ -38,6 +39,7 @@ class OVMenuItem
 public class OVMsgBoxMenu : OVMsgBox
 {
 	public string _JsonFilePrefix = "systemmenu";
+	public string _MenuName;
 
 	Transform _BG;	
 
@@ -63,14 +65,18 @@ public class OVMsgBoxMenu : OVMsgBox
 		OVMenuDef def;
 		def.x = def.y = def.w = def.h = 0;
 		def.items = null;
-		try	{
+		try
+		{
 			def = JsonUtility.FromJson<OVMenuDef>(json);
+			_MenuName = def.name;
 			def.items = OVJsonHelper.FromJson<OVMenuItemDef>(json);
 		}
 		catch(Exception e) {
 			Debug.Log("Parse json menu-items failed: " + e.Message);
 		}
-
+		if (null == _MenuName) {
+			_MenuName = "";
+		}
 		if (def.w > 0 && def.h > 0) {
 			ApplyTransRect(_BG as RectTransform, def.x, def.y, def.w, def.h, 0, false);
 		}
@@ -126,7 +132,7 @@ public class OVMsgBoxMenu : OVMsgBox
 		if (_PreOmniCoupleRate != OVSDK.GetUserOmniCoupleRate()) { 
 			OVSDK.sendMsg(14, "");
 		}
-
+		OVSDK.sendMsg(15, _MenuName);
 		_AllMsgBoxJson.Remove(this);
 
 		base.OnDestroy();
@@ -311,6 +317,14 @@ public class OVMsgBoxMenu : OVMsgBox
 			_Items.Add(item);
 		}
 		return item;
+	}
+
+	public bool tryClose(string name)
+	{
+		if ((name.Length == 0) || (_MenuName == name)) {
+			Close();
+		}
+		return ((name.Length != 0) && (_MenuName == name));
 	}
 
 	public bool UpdateItemCmd(string name, string cmd)

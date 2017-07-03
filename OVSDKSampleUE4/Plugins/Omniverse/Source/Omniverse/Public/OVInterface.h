@@ -192,7 +192,7 @@ public:
 	static AOVDlgBase *ShowDlgPrompt(FText text, FVector loc = FVector::ZeroVector, FRotator rot = FRotator::ZeroRotator, bool alwaysOnCamera = true, bool billboard = false, float duration = 2.0f, float fadeout = 1.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "OVSDK")
-	static void UpdateDlgJsonWidgetCmd(const FString &jsonFilePrefix, const FString &widgetName, const FString &cmd);
+	static void UpdateDlgJsonWidgetCmd(const FString &DlgJsonName, const FString &widgetName, const FString &cmd);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetActor", Keywords = "GetActor"), Category = "OVSDK")
 	static AOVRayActor *GetActor();
@@ -241,4 +241,5 @@ private:
 	static void onEventLoadGame(int retCode, const char *result, unsigned resultLen);
 public:
 	static void onEventUpdateDlgJsonCmd(const char *result);
+	static void onEventCloseDlgJsonCmd(const char *result);
 };
