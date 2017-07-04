@@ -356,6 +356,9 @@ public class OVSDK : MonoBehaviour
 				case 13:
 					onEventMsgBoxJsonCmd(ret);
 					break;
+				case 16:
+					onEventCloseMsgBoxJson(ret);
+					break;
 			}
 
 			//if (null != _DllEventCallback)
@@ -483,32 +486,16 @@ public class OVSDK : MonoBehaviour
     }
 
     // HeroVR System Menu
-    static OVMsgBox _MsgboxSystemMenu = null;
 	public static bool _DisableSystemMenu = false;    //for test System-Menu in development environment.
 
     static void onEventSystemMenu(string param)
     {
-        if (!_DisableSystemMenu && _MsgboxSystemMenu == null)
-        {
-            GameObject mb = GameObject.Instantiate(Resources.Load("OVSDK_MsgboxMenu"), Vector3.zero, Quaternion.identity) as GameObject;
-            if (mb)
-            {
-                _MsgboxSystemMenu = mb.GetComponentInChildren<OVMsgBoxMenu>();
-                _MsgboxSystemMenu._onEvent = onMsgBoxSystemMenuEvent;
-            }
-        }
+		onEventMsgBoxJson("systemmenu");
     }
 
     static bool onMsgBoxSystemMenuEvent(OVMsgBox hmb, string sEvent, GameObject go)
     {
-        if (sEvent == "destroy")
-        {
-            if (hmb == _MsgboxSystemMenu)
-            {
-                _MsgboxSystemMenu = null;
-            }
-        }
-        else if (sEvent == "click")
+		if (sEvent == "click")
         {
             if (go.name == "Yes")
             {
@@ -539,9 +526,21 @@ public class OVSDK : MonoBehaviour
 		MsgBoxJson(param);
 	}
 
+	static float z = 0f;
+	static float pos_z = 0f;
+
 	public static void MsgBoxJson(string param)
 	{
-		GameObject mb = GameObject.Instantiate(Resources.Load("OVSDK_MsgboxMenu"), Vector3.zero, Quaternion.identity) as GameObject;
+		if (OVMsgBoxMenu._AllMsgBoxJson.Count == 0)
+		{
+			z = 0f;
+			pos_z = 0f;
+		}
+		GameObject mb = GameObject.Instantiate(Resources.Load("OVSDK_MsgboxMenu"), new Vector3(0, 0, z), Quaternion.identity) as GameObject;
+		z += 1;
+		RectTransform t = mb.transform.FindChild("Canvas") as RectTransform;
+		t.localPosition = new Vector3(0, 0, pos_z);
+		pos_z += 0.001f;
 		if (mb)
 		{
 			OVMsgBoxMenu mbm = mb.GetComponentInChildren<OVMsgBoxMenu>();
@@ -551,29 +550,45 @@ public class OVSDK : MonoBehaviour
 		}
 	}
 
+	public static void onEventCloseMsgBoxJson(string param)
+	{
+		foreach (OVMsgBoxMenu mbm in OVMsgBoxMenu._AllMsgBoxJson)
+		{
+			if (mbm.tryClose(param)) {
+				break;
+			}
+		}
+	}
+
 	static void onEventMsgBoxJsonCmd(string param)
 	{
-		string prefix = null, name = null, cmd = null;
+		string menu_name, item_name, cmd;
 		int sep = param.IndexOf(' ');
 		if (sep > 0)
 		{
-			prefix = param.Substring(0, sep);
+			menu_name = param.Substring(0, sep);
 			int sep2 = param.IndexOf(' ', sep + 1);
-			if (sep2 > 0) {
-				name = param.Substring(sep + 1, sep2 - sep - 1);
-				cmd = param.Substring(sep2 + 1);
-			}
-		}
-
-		if (cmd != null)
-		{
-			foreach (OVMsgBoxMenu mbm in OVMsgBoxMenu._AllMsgBoxJson)
+			if (sep2 > 0)
 			{
-				if (mbm._JsonFilePrefix == prefix) {
-					mbm.UpdateItemCmd(name, cmd);
+				item_name = param.Substring(sep + 1, sep2 - sep - 1);
+				cmd = param.Substring(sep2 + 1);
+				if (cmd.Length > 0)
+				{
+					bool find_succ = false;
+					foreach (OVMsgBoxMenu mbm in OVMsgBoxMenu._AllMsgBoxJson)
+					{
+						if (mbm._MenuName == menu_name)
+						{
+							mbm.UpdateItemCmd(item_name, cmd);
+							find_succ = true;
+						}
+					}
+					if (!find_succ) {
+						sendMsg(15, OVMsgBoxMenu._AllMsgBoxJson.Count > 0 ? menu_name : "");
+					}
 				}
 			}
-		}		
+		}
 	}
 
 	public static void CheckOmniViveAvailable(bool bSwitchToDevModeIfNA = true)

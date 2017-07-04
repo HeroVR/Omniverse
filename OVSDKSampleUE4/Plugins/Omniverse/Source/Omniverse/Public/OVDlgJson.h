@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Runtime/Core/Public/Core.h"
 #include "Runtime/Engine/Public/EngineMinimal.h"
 #include "OVDlgBase.h"
@@ -35,12 +35,18 @@ class OMNIVERSE_API AOVDlgJson : public AOVDlgBase
 
 	bool LoadJson(const char *jsonFilePrefix);
 	bool UpdateCmd(const FString &name, const FString &cmd);
+	bool TryClose(const FString &name);
+	inline const FString &GetDlgJsonName() const {
+		return DlgJsonName;
+	}
 
 	static char* LoadFile(const char *path);
 protected:
 	class UClass *ButtonClass, *TextClass, *SliderClass;
+	float PreUserOmniCoupleRate;
 
 	FString JsonPrefix;
+	FString DlgJsonName;
 	TArray<UJsonWidget*> JsonWidgets;
 
 	bool NewWidget(UPanelWidget *panel, const FString &name, const FString &type, int x, int y, int w, int h, const FString &style, const FString &cmd);

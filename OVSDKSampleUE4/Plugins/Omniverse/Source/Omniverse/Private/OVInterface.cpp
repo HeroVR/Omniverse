@@ -515,38 +515,63 @@ AOVDlgBase *UOVInterface::ShowDlgPrompt(FText text, FVector loc, FRotator rot, b
 	return dlg;
 }
 
-void UOVInterface::UpdateDlgJsonWidgetCmd(const FString &jsonFilePrefix, const FString &widgetName, const FString &cmd)
+void UOVInterface::UpdateDlgJsonWidgetCmd(const FString &DlgJsonName, const FString &widgetName, const FString &cmd)
 {
+	bool find_succ = false;
+	FString name;
 	for (int i = 0; i < DlgList.Num(); ++i)
 	{
 		AOVDlgJson *dlg = Cast<AOVDlgJson>(DlgList[i]);
-		if (dlg != nullptr && dlg->JsonPrefix == jsonFilePrefix) {
+		if (dlg != nullptr && dlg->DlgJsonName == DlgJsonName)
+		{
 			dlg->UpdateCmd(widgetName, cmd);
+			find_succ = true;
+			name = dlg->DlgJsonName;
 		}
+	}
+	if (!find_succ)
+	{
+		FString tmp = DlgList.Num() > 0 ? DlgJsonName : "";
+		UOVInterface::SendCommand(15, tmp, tmp.Len());
 	}
 }
 
 void UOVInterface::onEventUpdateDlgJsonCmd(const char *result)
 {
 	FString param = UTF8_TO_TCHAR(result);
-	FString prefix, name, cmd;
+	FString dlg_name, widget_name, cmd;
 
 	int32 sep = 0, sep2 = 0;
 	if (param.FindChar(' ', sep))
 	{
-		prefix = param.Mid(0, sep);
+		dlg_name = param.Mid(0, sep);
 		sep2 = param.Find(TEXT(" "), ESearchCase::CaseSensitive, ESearchDir::FromStart, sep + 1);
 		if (sep2 > 0)
 		{
-			name = param.Mid(sep + 1, sep2 - sep - 1);
+			widget_name = param.Mid(sep + 1, sep2 - sep - 1);
 			cmd = param.Mid(sep2 + 1);
 		}
 	}
 
 	if (!cmd.IsEmpty())	{
-		UpdateDlgJsonWidgetCmd(prefix, name, cmd);
+		UpdateDlgJsonWidgetCmd(dlg_name, widget_name, cmd);
 	}
 	
+}
+
+void UOVInterface::onEventCloseDlgJsonCmd(const char *result)
+{
+	FString name;
+	if ((NULL != result) && (0 != result[0])) {
+		name = result;
+	}
+	for (int i = 0; i < DlgList.Num(); ++i)
+	{
+		AOVDlgJson *dlg = Cast<AOVDlgJson>(DlgList[i]);
+		if (dlg->TryClose(name)) {
+			break;
+		}
+	}
 }
 
 UWorld* UOVInterface::GetGameWorld()
@@ -729,17 +754,7 @@ void UOVInterface::onEventResumeGameResult(const char *result)
 
 void UOVInterface::onEventSystemMenu(const char *result)
 {
-	if (GetInstance()->bDisableMenuBox) {
-		return;
-	}
-
-	if (AOVMenuBox::GetInstance() == nullptr) 
-	{
-		UWorld *world = GetGameWorld();
-		if (world)	{
-			world->SpawnActor<AOVMenuBox>(AOVMenuBox::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
-		}		
-	}
+	ShowDlgJson("systemmenu");
 }
 
 void UOVInterface::SetRayHand(int i)

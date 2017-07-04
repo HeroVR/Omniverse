@@ -1,4 +1,4 @@
-#include "OmniversePrivatePCH.h"
+﻿#include "OmniversePrivatePCH.h"
 #include "EngineGlobals.h"
 #include "OVMenuBox.h"
 #include "WidgetComponent.h"
@@ -6,7 +6,7 @@
 #pragma warning(disable: 4996)
 
 AOVDlgJson::AOVDlgJson(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	: Super(ObjectInitializer), PreUserOmniCoupleRate(-1)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickEnabled(true);
@@ -57,6 +57,7 @@ bool AOVDlgJson::LoadJson(const char *jsonFilePrefix)
 	if (FJsonSerializer::Deserialize(reader, values))
 	{
 		uint32 x = 0, y = 0, w = 0, h = 0;
+		values->TryGetStringField("name", DlgJsonName);
 		values->TryGetNumberField("w", w);
 		values->TryGetNumberField("h", h);
 		if (w > 0 && h > 0) 
@@ -151,7 +152,10 @@ bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FStri
 		else if (type == "Slider") 
 		{
 			USlider *sld = Cast<USlider>(widget->GetRootWidget());
-			if (sld) {
+			if (sld)
+			{
+				PreUserOmniCoupleRate = UOVInterface::GetOmniCoupleRate();
+				sld->SetValue(PreUserOmniCoupleRate);
 				sld->OnValueChanged.AddDynamic(&*mw, &UJsonWidget::OnSlide);
 			}
 		}
@@ -240,8 +244,21 @@ bool AOVDlgJson::UpdateCmd(const FString &name, const FString &cmd)
 	return false;
 }
 
+bool AOVDlgJson::TryClose(const FString &name)
+{
+	if ((0 == name.Len()) || name == DlgJsonName) {
+		GWorld->DestroyActor(this);
+	}
+	return ((0 != name.Len()) && name == DlgJsonName);
+}
+
 void AOVDlgJson::EndPlay(const EEndPlayReason::Type reason)
 {
+	if (PreUserOmniCoupleRate > -0.01f
+		&& UOVInterface::GetUserInfo()->nUserCoupleRate > 0
+		&& PreUserOmniCoupleRate != (0.0001 * UOVInterface::GetUserInfo()->nUserCoupleRate - 1)) {
+		UOVInterface::SendCommand(14, "", 0);
+	}
 	for (int i = 0; i < JsonWidgets.Num(); ++i) {
 		JsonWidgets[i]->RemoveFromRoot();
 	}
@@ -262,7 +279,6 @@ void AOVDlgJson::Tick(float DeltaTime)
 	}
 }
 
-extern DllSendCommand funcSendCommand;
 void UJsonWidget::OnClick()
 {
 	TArray<FString> cmds;
@@ -270,10 +286,11 @@ void UJsonWidget::OnClick()
 	{
 		int cmd_id = cmds[2].IsEmpty() ? 0 : FCString::Atoi(*cmds[2]);
 		if (cmd_id && funcSendCommand) {
-			funcSendCommand(cmd_id, "", 0);
+			const FString &name = Dlg->GetDlgJsonName();
+			UOVInterface::SendCommand(cmd_id, name, name.Len());
 		}
 
-		if (GWorld && !(cmds.Num() > 3 && !cmds[3].IsEmpty() && FCString::Atoi(*cmds[3]) != 0))	{
+		if (GWorld && !(cmds.Num() > 3 && !cmds[3].IsEmpty() && FCString::Atoi(*cmds[3]) != 0)) {
 			GWorld->DestroyActor(Dlg);
 		}
 	}
