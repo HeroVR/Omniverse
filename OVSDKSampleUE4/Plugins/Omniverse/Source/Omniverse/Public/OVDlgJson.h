@@ -43,6 +43,7 @@ class OMNIVERSE_API AOVDlgJson : public AOVDlgBase
 	static char* LoadFile(const char *path);
 protected:
 	class UClass *ButtonClass, *TextClass, *SliderClass;
+	float PreUserOmniCoupleRate;
 
 	FString JsonPrefix;
 	FString DlgJsonName;

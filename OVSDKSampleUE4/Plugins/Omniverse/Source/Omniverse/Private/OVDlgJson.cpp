@@ -6,7 +6,7 @@
 #pragma warning(disable: 4996)
 
 AOVDlgJson::AOVDlgJson(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	: Super(ObjectInitializer), PreUserOmniCoupleRate(-1)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickEnabled(true);
@@ -152,7 +152,10 @@ bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FStri
 		else if (type == "Slider") 
 		{
 			USlider *sld = Cast<USlider>(widget->GetRootWidget());
-			if (sld) {
+			if (sld)
+			{
+				PreUserOmniCoupleRate = UOVInterface::GetOmniCoupleRate();
+				sld->SetValue(PreUserOmniCoupleRate);
 				sld->OnValueChanged.AddDynamic(&*mw, &UJsonWidget::OnSlide);
 			}
 		}
@@ -251,6 +254,11 @@ bool AOVDlgJson::TryClose(const FString &name)
 
 void AOVDlgJson::EndPlay(const EEndPlayReason::Type reason)
 {
+	if (PreUserOmniCoupleRate > -0.01f
+		&& UOVInterface::GetUserInfo()->nUserCoupleRate > 0
+		&& PreUserOmniCoupleRate != (0.0001 * UOVInterface::GetUserInfo()->nUserCoupleRate - 1)) {
+		UOVInterface::SendCommand(14, "", 0);
+	}
 	for (int i = 0; i < JsonWidgets.Num(); ++i) {
 		JsonWidgets[i]->RemoveFromRoot();
 	}
