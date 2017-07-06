@@ -11,12 +11,12 @@ public class OVSDK : MonoBehaviour
 {
 	public static string _SDKVersion = "0.3.0";
 
-	//public delegate void OVSDKEventCallback(int nMsgType, string sMsgContent);
+	public delegate void OVSDKEventCallback(int nMsgType, string sMsgContent);
 	public delegate void OVSDKBuyCallback(string sItem, string sOutTradeNo, string sInTradeNo, string sErr);
 	public delegate void OVSDKSaveGameDataCallback(int nError, string sMsg);
 	public delegate void OVSDKLoadGameDataCallback(int nError, string sMsg, IntPtr data, int len);
 
-	//static OVSDKEventCallback _DllEventCallback = null;
+	static OVSDKEventCallback _DllEventCallback = null;
 	static OVSDKSaveGameDataCallback _SaveGameDataCB = null;
 	static OVSDKLoadGameDataCallback _LoadGameDataCB = null;
 
@@ -117,7 +117,10 @@ public class OVSDK : MonoBehaviour
 			return _Instance;
 		}
 	}
-
+    public static void SetCallBackOnMsgFromSDK(OVSDKEventCallback cbHvMsg)
+    {
+        _DllEventCallback = cbHvMsg;
+    }
 	public static void Init(int nGameId, string sGameKey, string sParam)
 	{
 		if (null == OVSDK.instance) {
@@ -359,14 +362,17 @@ public class OVSDK : MonoBehaviour
 				case 16:
 					onEventCloseMsgBoxJson(ret);
 					break;
-			}
+                default:
+                    if (null != _DllEventCallback)
+                    {
+                        _DllEventCallback(nRetCode, ret);
+                    }
+                    break;
+            }
 
-			//if (null != _DllEventCallback)
-			//{
-			//	_DllEventCallback(nRetCode, ret);
-			//}
-		}
-		else if (type == "buy ")
+
+        }
+        else if (type == "buy ")
 		{
 			onEventBuy(ret);
 		}
@@ -526,21 +532,21 @@ public class OVSDK : MonoBehaviour
 		MsgBoxJson(param);
 	}
 
-	static float z = 0f;
+	static float render_z = 0f;
 	static float pos_z = 0f;
 
 	public static void MsgBoxJson(string param)
 	{
 		if (OVMsgBoxMenu._AllMsgBoxJson.Count == 0)
 		{
-			z = 0f;
-			pos_z = 0f;
+			render_z = 10f;
+			pos_z = 6f;
 		}
-		GameObject mb = GameObject.Instantiate(Resources.Load("OVSDK_MsgboxMenu"), new Vector3(0, 0, z), Quaternion.identity) as GameObject;
-		z += 1;
+		GameObject mb = GameObject.Instantiate(Resources.Load("OVSDK_MsgboxMenu"), new Vector3(0, 0, render_z), Quaternion.identity) as GameObject;
+		render_z += 1;
 		RectTransform t = mb.transform.FindChild("Canvas") as RectTransform;
 		t.localPosition = new Vector3(0, 0, pos_z);
-		pos_z += 0.001f;
+		pos_z -= 0.008f;
 		if (mb)
 		{
 			OVMsgBoxMenu mbm = mb.GetComponentInChildren<OVMsgBoxMenu>();

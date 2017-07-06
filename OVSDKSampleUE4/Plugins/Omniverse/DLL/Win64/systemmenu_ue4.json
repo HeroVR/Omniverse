@@ -28,6 +28,7 @@
       "w": "400",
       "h": "80",
       "type": "Button",
+      "msgid": "7",
       "cmd": "|Back to Lobby|7|0"
     },
     {
@@ -36,6 +37,7 @@
       "w": "400",
       "h": "80",
       "type": "Button",
+      "msgid": "8",
       "cmd": "|Leave|8|0"
     },
     {
@@ -44,6 +46,7 @@
       "w": "400",
       "h": "80",
       "type": "Button",
+      "close": "1",
       "cmd": "|Return to game|0|0"
     },
     {

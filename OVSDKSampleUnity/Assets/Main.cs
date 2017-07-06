@@ -51,7 +51,7 @@ public class Main : MonoBehaviour {
 //#endif
 
         // buttons in sample-scene
-        OVSDK._ControllerRay.CheckShow(1);
+        OVSDK._ControllerRay.RayVisibility = OVControllerRay.RayVisibility_AlwaysShow;
 
         if (_MsgboxIniting != null)
         {
@@ -180,27 +180,4 @@ public class Main : MonoBehaviour {
 
         OVSDK.Buy("Box", 0.88, out_trade_no, OnBuyResult);
     }
-
-	public void OnClickSampleSwitchControllerRay(GameObject sender)
-    {
-		OVSDK._ControllerRay.CheckShow(OVSDK._ControllerRay.IsForceShow() ? 0 : 1);
-
-		UpdateButtonSwitchControllerRay(sender);
-    }
-
-	void UpdateButtonSwitchControllerRay(GameObject btn)
-	{
-		if (btn)
-		{
-			Transform child = btn.transform.FindChild("Text");
-			if (child)
-			{
-				child.GetComponent<Text>().text = OVSDK._ControllerRay.IsForceShow()
-												? "Auto show/hide controller-ray"
-												: "Always show controller-ray";
-			}
-
-			btn.GetComponent<Image>().color = OVSDK._ControllerRay.IsVisible() ? Color.white : Color.red;
-		}		
-	}
 }

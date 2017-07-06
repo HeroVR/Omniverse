@@ -16,7 +16,7 @@ public enum OVButtonState
     Pressed,
 }
 
-public class OVButton : MonoBehaviour
+public class OVButton : Selectable, IPointerClickHandler,  IDragHandler
 {
     [SerializeField]
     public Sprite _StyleNormal;
@@ -38,20 +38,23 @@ public class OVButton : MonoBehaviour
     Collider _buttonCollider;
     public bool _isCheckBox;
     public bool _isSlider;
+	public bool _bIgnoreRay = false;
 
     public bool _isChecked { get; set; }
 
     [FormerlySerializedAs("onClick"), SerializeField]
     public Button.ButtonClickedEvent m_OnClick = new Button.ButtonClickedEvent();
 
-    void OnEnable()
+     new void OnEnable()
     {
-        if(!_isCheckBox)
+        base.OnEnable();
+        if (!_isCheckBox)
         {
             SetButtonState(OVButtonState.Normal);
-        }else
+        }
+        else
         {
-            if(_Checknormal)
+            if (_Checknormal)
             {
                 IsChecked(this.gameObject);
             }
@@ -66,17 +69,18 @@ public class OVButton : MonoBehaviour
         listener.onDrag += this.OnDrag;
 
         listener.onEnter += this.onEnter;
-        if(_Buttontext != "" && OVSDK.HasInitialized())
+        if (_Buttontext != "" && OVSDK.HasInitialized())
         {
             Text t;
-            if(null!=(t= this.GetComponentInChildren<Text>()))
+            if (null != (t = this.GetComponentInChildren<Text>()))
             {
                 t.text = OVSDK.GetString(_Buttontext);
             }
         }
     }
-    void OnDisable()
+    new void  OnDisable()
     {
+        base.OnDisable();
         OVUIEventListener listener = OVUIEventListener.Get(this.gameObject);
         listener.onClick -= this.OnClick;
         listener.onUp -= this.onUp;
@@ -135,7 +139,7 @@ public class OVButton : MonoBehaviour
     {
       //  Debug.Log("OnClick" + sender.name);
         this.SetButtonState(OVButtonState.Normal);
-        this.m_OnClick.Invoke();
+
         if(_isCheckBox)
         {
             IsChecked(sender);
@@ -144,7 +148,15 @@ public class OVButton : MonoBehaviour
     public virtual void onUp(GameObject sender)
     {
      //   Debug.Log("onUp" + sender.name);
-        this.SetButtonState(OVButtonState.Normal);
+        if(this._isSlider)
+        {
+            this.SetButtonState(OVButtonState.Normal);
+        }
+        else
+        {
+            this.SetButtonState(OVButtonState.Normal);
+        }
+
     }
     public virtual void OnDrag(GameObject sender, PointerEventData ped)
     {
@@ -155,15 +167,15 @@ public class OVButton : MonoBehaviour
         if(sender.gameObject)
         {
             Vector2 pos = ped.position;
-            RectTransform rect = this.transform as RectTransform;
+           // RectTransform rect = this.transform as RectTransform;
             Canvas ca = this.transform.root.GetComponentInChildren<Canvas>();
 			if (ca != null)
 			{
 				RectTransform canvasRect = ca.transform as RectTransform;
 
-				RectTransform sliderRect = rect.parent.parent.GetComponent<RectTransform>();
+				RectTransform sliderRect = GetComponent<RectTransform>();
 				Vector2 dis = (pos + canvasRect.offsetMin) - sliderRect.anchoredPosition;
-				RectTransform areaRect = rect.parent.GetComponent<RectTransform>();
+				RectTransform areaRect = this.transform.FindChild("Handle Slide Area").GetComponent<RectTransform>();
 				float w = sliderRect.sizeDelta.x + areaRect.sizeDelta.x;
 				if (dis.x < -w) {
 					dis.x = -w;
@@ -238,4 +250,41 @@ public class OVButton : MonoBehaviour
         }
 
     }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left)
+        {
+            return;
+        }
+        this.Press();
+
+    }
+
+    private void Press()
+    {
+        if (!this.IsActive() || !this.IsInteractable())
+        {
+            return;
+        }
+        this.m_OnClick.Invoke();
+        this.OnClick(this.gameObject);
+    }
+
+
+    public void OnDrag(PointerEventData eventData)
+    {
+
+    }
+
+    public override void OnPointerEnter(PointerEventData eventData)
+    {
+        this.onEnter(this.gameObject);
+    }
+
+    public override void OnPointerExit(PointerEventData eventData)
+    {
+        this.onExit(this.gameObject);
+    }
+
 }

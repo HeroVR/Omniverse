@@ -46,10 +46,6 @@ public class OVMsgBox : MonoBehaviour
         _bStarted = true;
 
         ++_nCounter;        
-        if (_nCounter == 1) {
-            OVSDK._ControllerRay.CheckShow();
-        }
-
         if (null == _parent)
         {
             _parent = transform.parent.transform;
@@ -61,7 +57,9 @@ public class OVMsgBox : MonoBehaviour
         {
             Transform btn = transform.Find(id[i]);
             if (btn) {
-                OVUIEventListener.Get(btn.gameObject).onClick = this.OnClick;
+                OVButton obtn = btn.gameObject.GetComponent<OVButton>();
+                obtn.m_OnClick.AddListener(delegate () { this.OnClick(btn.gameObject); });
+               // OVUIEventListener.Get(btn.gameObject).onClick = this.OnClick;
             }
         }
 
@@ -80,10 +78,8 @@ public class OVMsgBox : MonoBehaviour
         if (_bStarted)
         {
             --_nCounter;
-            if (_nCounter == 0)
-            {
+            if (_nCounter == 0) {
 				_nVisibleCounter = 0;
-				OVSDK._ControllerRay.CheckShow(-1);				
 			}
         }        
     }
@@ -117,10 +113,10 @@ public class OVMsgBox : MonoBehaviour
 
 	private void LateUpdate()
 	{
-		if (OVSDK._ControllerRay._MainCamera)
+		if (OVSDK._ControllerRay._OVSDKCamera)
 		{
-            _parent.position = OVSDK._ControllerRay._MainCamera.transform.position;
-            _parent.rotation = OVSDK._ControllerRay._MainCamera.transform.rotation;
+            _parent.position = OVSDK._ControllerRay._OVSDKCamera.transform.position;
+            _parent.rotation = OVSDK._ControllerRay._OVSDKCamera.transform.rotation;
 		}
 	}
 
@@ -163,7 +159,7 @@ public class OVMsgBox : MonoBehaviour
                 }
                 else {
                     btn.gameObject.SetActive(true);
-                    OVUIEventListener.Get(btn.gameObject);
+                   // OVUIEventListener.Get(btn.gameObject);
                     transform.Find(id[i] + "/Text").GetComponent<Text>().text = cap[i];
                 }
             }

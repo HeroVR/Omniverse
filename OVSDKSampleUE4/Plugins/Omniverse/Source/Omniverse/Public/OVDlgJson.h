@@ -14,7 +14,8 @@ class UJsonWidget : public UObject
 public:
 	UUserWidget *Widget;
 	FString Name, Cmd;
-	bool DynaText;
+	int MsgId;
+	bool DirectClose, DynaText;
 	UTextBlock *TxtWidget;	
 	AOVDlgJson *Dlg;
 
@@ -35,7 +36,7 @@ class OMNIVERSE_API AOVDlgJson : public AOVDlgBase
 
 	bool LoadJson(const char *jsonFilePrefix);
 	bool UpdateCmd(const FString &name, const FString &cmd);
-	bool TryClose(const FString &name);
+	void TryClose(const FString &name);
 	inline const FString &GetDlgJsonName() const {
 		return DlgJsonName;
 	}
@@ -49,7 +50,7 @@ protected:
 	FString DlgJsonName;
 	TArray<UJsonWidget*> JsonWidgets;
 
-	bool NewWidget(UPanelWidget *panel, const FString &name, const FString &type, int x, int y, int w, int h, const FString &style, const FString &cmd);
+	bool NewWidget(UPanelWidget *panel, const FString &name, const FString &type, int x, int y, int w, int h, int MsgId, bool DirectClose, const FString &style, const FString &cmd);
 	UJsonWidget* LookupWidget(FString name);
 	bool UpdateText(UTextBlock *txtWidget, const FString &cmd);
 

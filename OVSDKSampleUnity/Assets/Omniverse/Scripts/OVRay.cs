@@ -12,8 +12,5 @@ public class OVRay : MonoBehaviour
 		OVSDK._ControllerRay.OnRayDestroy(gameObject);
 	}
 
-	void Update()
-	{
 
-	}
 }

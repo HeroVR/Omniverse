@@ -1,6 +1,6 @@
 ﻿#include "OmniversePrivatePCH.h"
+#include "OVDlgJson.h"
 #include "EngineGlobals.h"
-#include "OVMenuBox.h"
 #include "WidgetComponent.h"
 
 #pragma warning(disable: 4996)
@@ -50,13 +50,13 @@ bool AOVDlgJson::LoadJson(const char *jsonFilePrefix)
 		return false;
 	}
 	
-	TSharedRef< TJsonReader<TCHAR> > reader = TJsonReaderFactory<char>::Create(json);
+	TSharedRef< TJsonReader<TCHAR> > reader = TJsonReaderFactory<TCHAR>::Create(UTF8_TO_TCHAR(json));
 	delete[] json;
 
 	TSharedPtr<FJsonObject> values;
 	if (FJsonSerializer::Deserialize(reader, values))
 	{
-		uint32 x = 0, y = 0, w = 0, h = 0;
+		uint32 x = 0, y = 0, w = 0, h = 0, msgid = 0, direct_close = 0;
 		values->TryGetStringField("name", DlgJsonName);
 		values->TryGetNumberField("w", w);
 		values->TryGetNumberField("h", h);
@@ -79,6 +79,8 @@ bool AOVDlgJson::LoadJson(const char *jsonFilePrefix)
 			jo.TryGetNumberField("y", y);
 			jo.TryGetNumberField("w", w);
 			jo.TryGetNumberField("h", h);
+			jo.TryGetNumberField("msgid", msgid);
+			jo.TryGetNumberField("close", direct_close);
 
 			FString name, type, style, cmd;
 			jo.TryGetStringField("name", name);
@@ -86,14 +88,14 @@ bool AOVDlgJson::LoadJson(const char *jsonFilePrefix)
 			jo.TryGetStringField("style", style);
 			jo.TryGetStringField("cmd", cmd);
 
-			NewWidget(panel, name, type, x, y, w, h, style, cmd);
+			NewWidget(panel, name, type, x, y, w, h, msgid, (0 != direct_close), style, cmd);
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Json " + values[i]->AsObject()->);
 		}
 	}
 	return true;
 }
 
-bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FString &type, int x, int y, int w, int h, const FString &style, const FString &cmd)
+bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FString &type, int x, int y, int w, int h, int MsgId, bool DirectClose, const FString &style, const FString &cmd)
 {
 	TSubclassOf<class UObject> clazz = TextClass;
 	if (type == "Button") {
@@ -136,6 +138,8 @@ bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FStri
 		mw->Widget = widget;
 		mw->Name = name;
 		mw->Cmd = cmd;
+		mw->MsgId = MsgId;
+		mw->DirectClose = DirectClose;
 
 		UButton *btn = nullptr;
 		UTextBlock *txtWidget = nullptr;
@@ -244,21 +248,21 @@ bool AOVDlgJson::UpdateCmd(const FString &name, const FString &cmd)
 	return false;
 }
 
-bool AOVDlgJson::TryClose(const FString &name)
+void AOVDlgJson::TryClose(const FString &name)
 {
 	if ((0 == name.Len()) || name == DlgJsonName) {
 		GWorld->DestroyActor(this);
 	}
-	return ((0 != name.Len()) && name == DlgJsonName);
 }
 
 void AOVDlgJson::EndPlay(const EEndPlayReason::Type reason)
 {
 	if (PreUserOmniCoupleRate > -0.01f
 		&& UOVInterface::GetUserInfo()->nUserCoupleRate > 0
-		&& PreUserOmniCoupleRate != (0.0001 * UOVInterface::GetUserInfo()->nUserCoupleRate - 1)) {
+		&& (3 < FMath::Abs((PreUserOmniCoupleRate * 10000) - (UOVInterface::GetUserInfo()->nUserCoupleRate - 1)))) {
 		UOVInterface::SendCommand(14, "", 0);
 	}
+	UOVInterface::SendCommand(15, DlgJsonName, DlgJsonName.Len());
 	for (int i = 0; i < JsonWidgets.Num(); ++i) {
 		JsonWidgets[i]->RemoveFromRoot();
 	}
@@ -281,18 +285,12 @@ void AOVDlgJson::Tick(float DeltaTime)
 
 void UJsonWidget::OnClick()
 {
-	TArray<FString> cmds;
-	if (Cmd.ParseIntoArray(cmds, TEXT("|"), false) > 2)
-	{
-		int cmd_id = cmds[2].IsEmpty() ? 0 : FCString::Atoi(*cmds[2]);
-		if (cmd_id && funcSendCommand) {
-			const FString &name = Dlg->GetDlgJsonName();
-			UOVInterface::SendCommand(cmd_id, name, name.Len());
-		}
-
-		if (GWorld && !(cmds.Num() > 3 && !cmds[3].IsEmpty() && FCString::Atoi(*cmds[3]) != 0)) {
-			GWorld->DestroyActor(Dlg);
-		}
+	if (DirectClose) {
+		GWorld->DestroyActor(Dlg);
+	}
+	else {
+		FString msg = "dlg=" + Dlg->GetDlgJsonName() + ";wgt=" + Name;
+		UOVInterface::SendCommand(MsgId, msg, msg.Len());
 	}
 }
 

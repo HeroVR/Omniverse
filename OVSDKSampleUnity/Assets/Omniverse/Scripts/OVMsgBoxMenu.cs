@@ -9,7 +9,7 @@ using System;
 [System.Serializable]
 struct OVMenuItemDef
 {
-	public int x, y, w, h, rot;
+	public int x, y, w, h, rot, msgid, close;
 	public string type, style, color, name;
 	public string cmd; //format: txt_arg;txt_format;cmd_type;close_after_click;
 }
@@ -28,6 +28,8 @@ class OVMenuItem
 	public bool dynaTxt;
 	public Text txtCompo;
 	public string name, cmd;
+	public int msgId;
+	public bool directClose;
 	public void OnSliderValueChange(float val)
 	{
 		if (name == "OmniCoupleRate")	{
@@ -48,6 +50,37 @@ public class OVMsgBoxMenu : OVMsgBox
 	int _PreOmniCoupleRate = -1;
 
 	public static List<OVMsgBoxMenu> _AllMsgBoxJson = new List<OVMsgBoxMenu>();
+
+	private void refreshButtonsState()
+	{
+		int count = _AllMsgBoxJson.Count;
+		for (int i = 0; i < count; ++i)
+		{
+			bool enable = i == (count - 1);
+			for (int j = 0; j < _AllMsgBoxJson[i]._Items.Count; ++j)
+			{
+				OVButton btn = _AllMsgBoxJson[i]._Items[j].go.GetComponent<OVButton>();
+				if (btn)
+                { 
+                    Image imag = btn.GetComponent<Image>();
+                    if (imag)
+                    {
+                        imag.raycastTarget = enable;
+                        Text[] text = imag.GetComponentsInChildren<Text>();
+                        if (text.Length > 0)
+                        {
+                            foreach(var K in text)
+                            {
+                                K.raycastTarget = enable;
+                            }
+                        }
+
+                    }
+
+				}
+			}
+		}
+	}
 
 	protected override void Start ()
 	{
@@ -87,17 +120,23 @@ public class OVMsgBoxMenu : OVMsgBox
 			if (item != null)
 			{
 				if (def.items[i].type == "Button")	{
-					OVUIEventListener.Get(item.go.gameObject).onClick = this.OnClick;
-				}
+
+                    OVButton btn = item.go.gameObject.GetComponent<OVButton>();
+                    btn.m_OnClick.AddListener(delegate(){ this.OnClick(item.go.gameObject); });
+                   // OVUIEventListener.Get(item.go.gameObject).onClick += this.OnClick;
+
+                }
 				
 				if (def.items[i].type == "Slider")
 				{
-					if (item.name == "OmniCoupleRate")	{
-						_PreOmniCoupleRate = OVSDK.GetUserOmniCoupleRate();
-					}
-					
 					Slider slider = item.go.GetComponent<Slider>();
-					if (slider != null)	{
+					if (slider != null)
+					{
+						if (item.name == "OmniCoupleRate")
+						{
+							_PreOmniCoupleRate = OVSDK.GetUserOmniCoupleRate();
+							slider.value = OVSDK.GetOmniCoupleRate();
+						}
 						slider.onValueChanged.AddListener(item.OnSliderValueChange);
 					}
 				}
@@ -105,7 +144,8 @@ public class OVMsgBoxMenu : OVMsgBox
 		}
 
 		_AllMsgBoxJson.Add(this);
-    }
+		refreshButtonsState();
+	}
 
     // Update is called once per frame
     protected override void Update ()
@@ -134,6 +174,7 @@ public class OVMsgBoxMenu : OVMsgBox
 		}
 		OVSDK.sendMsg(15, _MenuName);
 		_AllMsgBoxJson.Remove(this);
+		refreshButtonsState();
 
 		base.OnDestroy();
 	}
@@ -194,29 +235,17 @@ public class OVMsgBoxMenu : OVMsgBox
 		{
 			return;
 		}
-
-		bool close = true;
-
+		
 		int index = 0;
 		if (tryGetMenuItem(sender, ref index))
 		{
-			string[] cmds = _Items[index].cmd.Split('|');
-			if (cmds.Length > 2)
-			{
-				if (cmds[2].Length != 0)
-				{
-					OVSDK.sendMsg(int.Parse(cmds[2]), "");
-				}
-
-				if ((cmds.Length > 3) && (cmds[3].Length != 0) && (int.Parse(cmds[3]) != 0))
-				{
-					close = false;
-				}
+			if (_Items[index].directClose) {
+				Close();
 			}
-		}
-		if (close)
-		{
-			Close();
+			else {
+				string msg = "dlg=" + _MenuName + ";" + "wgt=" + _Items[index].name;
+				OVSDK.sendMsg(_Items[index].msgId, msg);
+			}
 		}
 	}
 
@@ -286,6 +315,8 @@ public class OVMsgBoxMenu : OVMsgBox
 			item.go = go;
 			item.cmd = def.cmd;
 			item.name = def.name;
+			item.msgId = def.msgid;
+			item.directClose = (0 != def.close);
 
 			// Rect
 			ApplyTransRect(go.transform as RectTransform, def.x, def.y, def.w, def.h, def.rot);

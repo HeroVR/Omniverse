@@ -1,6 +1,5 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 #include "OmniversePrivatePCH.h"
-#include "OVMenuBox.h"
 #include "OVDlgBase.h"
 #include "OVInterface.h"
 #include "OVStringRes.h"
@@ -88,6 +87,9 @@ void __stdcall UOVInterface::onEventFromDll(const char *name, int retCode, const
 		}
 		else if (retCode == 13) {
 			UOVInterface::onEventUpdateDlgJsonCmd(result);
+		}
+		else if (retCode == 16) {
+			UOVInterface::onEventCloseDlgJsonCmd(result);
 		}
 	}
 	else if (strcmp(name, "svgd") == 0) {
@@ -565,12 +567,16 @@ void UOVInterface::onEventCloseDlgJsonCmd(const char *result)
 	if ((NULL != result) && (0 != result[0])) {
 		name = result;
 	}
-	for (int i = 0; i < DlgList.Num(); ++i)
+	TArray<AOVDlgJson *> dlgs;
+	for (int i = (DlgList.Num() - 1); i >= 0; --i)
 	{
 		AOVDlgJson *dlg = Cast<AOVDlgJson>(DlgList[i]);
-		if (dlg->TryClose(name)) {
-			break;
+		if (NULL != dlg) {
+			dlgs.Add(dlg);
 		}
+	}
+	for (int i = (dlgs.Num() - 1); i >= 0; --i) {
+		dlgs[i]->TryClose(name);
 	}
 }
 

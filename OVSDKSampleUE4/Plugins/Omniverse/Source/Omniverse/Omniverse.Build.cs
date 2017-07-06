@@ -1,4 +1,4 @@
-// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
+﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 using System;
 using System.IO;
 using UnrealBuildTool;
@@ -64,7 +64,7 @@ public class Omniverse : ModuleRules
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
             string binaries_dir = Path.Combine(Plugin_dir, "DLL/Win64");
-            RuntimeDependencies.Add(new RuntimeDependency(binaries_dir + "/desktop_plugin.dll"));
+            RuntimeDependencies.Add(new RuntimeDependency(binaries_dir + "/Omniverse.Functions.dll"));
 		}
 
         DirectoryInfo TheFolder = new DirectoryInfo(Plugin_dir + "/Content/OVSDK");

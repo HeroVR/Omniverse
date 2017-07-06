@@ -4,9 +4,9 @@ public class OVCamera : MonoBehaviour
 {
 	void LateUpdate()
 	{
-		if (OVSDK._ControllerRay._MainCamera)
-		{           
-            Transform main_camera = OVSDK._ControllerRay._MainCamera.transform;
+		//if (OVSDK._ControllerRay._MainCamera)
+		//{           
+            Transform main_camera = Camera.main.transform;
 			if (!SteamVR.enabled)
 			{
 				transform.position = main_camera.position;
@@ -21,6 +21,6 @@ public class OVCamera : MonoBehaviour
                     transform.parent.rotation = user.rotation;
 				}
 			}
-        }
+     //   }
     }
 }
