@@ -101,7 +101,7 @@ void __stdcall UOVInterface::onEventFromDll(const char *name, int retCode, const
 }
 
 UOVInterface::UOVInterface(const FObjectInitializer &objIniter)
-	: Super(objIniter)
+	: Super(objIniter), RayRelativeLocation(0, 0, 0), RayRelativeRotation(-60, 0, 0)
 {
 	UmgDistance = 150;
 

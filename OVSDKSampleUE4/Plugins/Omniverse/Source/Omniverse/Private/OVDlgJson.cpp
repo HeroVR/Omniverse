@@ -16,6 +16,7 @@ AOVDlgJson::AOVDlgJson(const FObjectInitializer& ObjectInitializer)
 	static ConstructorHelpers::FObjectFinder<UClass> btn_bp(TEXT("Class'/Omniverse/OVSDK/Button.Button_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> txt_bp(TEXT("Class'/Omniverse/OVSDK/Text.Text_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> slider_bp(TEXT("Class'/Omniverse/OVSDK/Slider.Slider_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> toggle_bp(TEXT("Class'/Omniverse/OVSDK/Toggle.Toggle_C'"));
 	if (win_bp.Object && !HasAnyFlags(RF_ClassDefaultObject) && world) {
 		RootWidget = CreateWidget<UUserWidget>(GetWorld(), win_bp.Object);
 		WidgetComponent->SetWidget(RootWidget);
@@ -24,6 +25,7 @@ AOVDlgJson::AOVDlgJson(const FObjectInitializer& ObjectInitializer)
 	ButtonClass = btn_bp.Object;
 	TextClass = txt_bp.Object;
 	SliderClass = slider_bp.Object;
+	ToggleClass = toggle_bp.Object;
 }
 
 
@@ -107,6 +109,9 @@ bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FStri
 	else if (type == "Slider") {
 		clazz = SliderClass;
 	}
+	else if (type == "Toggle") {
+		clazz = ToggleClass;
+	}
 	else {
 		return false;
 	}	
@@ -155,12 +160,28 @@ bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FStri
 		}
 		else if (type == "Slider") 
 		{
-			USlider *sld = Cast<USlider>(widget->GetRootWidget());
-			if (sld)
+			if (name == "OmniCoupleRate")
 			{
-				PreUserOmniCoupleRate = UOVInterface::GetOmniCoupleRate();
-				sld->SetValue(PreUserOmniCoupleRate);
-				sld->OnValueChanged.AddDynamic(&*mw, &UJsonWidget::OnSlide);
+				USlider *sld = Cast<USlider>(widget->GetRootWidget());
+				if (sld)
+				{
+					PreUserOmniCoupleRate = UOVInterface::GetOmniCoupleRate();
+					sld->SetValue(PreUserOmniCoupleRate);
+					sld->OnValueChanged.AddDynamic(&*mw, &UJsonWidget::OnSlide);
+				}
+			}
+		}
+		else if (type == "Toggle")
+		{
+			if (name == "OmniCoupleMode")
+			{
+				UCheckBox *toggle = Cast<UCheckBox>(widget->GetRootWidget());
+				if (toggle)
+				{
+					PreUserOmniCoupleRate = UOVInterface::GetOmniCoupleRate();
+					toggle->SetCheckedState(PreUserOmniCoupleRate < 0.5f ? ECheckBoxState::Unchecked : ECheckBoxState::Checked);
+					toggle->OnCheckStateChanged.AddDynamic(&*mw, &UJsonWidget::OnToggle);
+				}
 			}
 		}
 		else {
@@ -299,6 +320,14 @@ void UJsonWidget::OnSlide(float val)
 	IPCUser *ui = UOVInterface::GetUserInfo();
 	if (ui)	{
 		ui->nUserCoupleRate = val * 10000 + 1;
+	}
+}
+
+void UJsonWidget::OnToggle(bool state)
+{
+	IPCUser *ui = UOVInterface::GetUserInfo();
+	if (ui) {
+		ui->nUserCoupleRate = (state ? 1.0f : 0.0f) * 10000 + 1;
 	}
 }
 

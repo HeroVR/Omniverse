@@ -162,6 +162,8 @@ void AOVRayActor::Tick(float DeltaSeconds)
 	}
 
 	WidgetInteraction->InteractionSource = hmd_enabled ? EWidgetInteractionSource::Custom : EWidgetInteractionSource::Mouse;
+	WidgetInteraction->SetRelativeRotation(UOVInterface::GetInstance()->RayRelativeRotation);
+	WidgetInteraction->SetRelativeLocation(UOVInterface::GetInstance()->RayRelativeLocation);
 	
 	if (WidgetInteraction->InteractionSource == EWidgetInteractionSource::Custom)
 	{

@@ -40,7 +40,7 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 				{
 					if (compo 
 						&& compo->IsA(UCameraComponent::StaticClass())
-						&& (CameraTag != NAME_None || compo->ComponentHasTag(CameraTag)))
+						&& (CameraTag == NAME_None || compo->ComponentHasTag(CameraTag)))
 					{
 						Camera = Cast<UCameraComponent>(compo);
 						break;
@@ -77,7 +77,9 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 				APlayerController *pc = CastChecked<APlayerController>(controller);
 				pc->SetControlRotation(FRotator(pc->RotationInput.Pitch, CurrYaw, pc->RotationInput.Roll));
 
-				Camera->GetAttachParent()->SetRelativeRotation(FQuat(FRotator(0, -pawn->GetActorRotation().Yaw + StartYawDiff, 0)));
+				if (Camera != nullptr) {
+					Camera->GetAttachParent()->SetRelativeRotation(FQuat(FRotator(0, -pawn->GetActorRotation().Yaw + StartYawDiff, 0)));
+				}				
 			}
 		}
 	}	

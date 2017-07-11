@@ -24,6 +24,9 @@ public:
 
 	UFUNCTION()
 	void OnSlide(float val);
+
+	UFUNCTION()
+	void OnToggle(bool state);
 };
 
 UCLASS()
@@ -43,7 +46,7 @@ class OMNIVERSE_API AOVDlgJson : public AOVDlgBase
 
 	static char* LoadFile(const char *path);
 protected:
-	class UClass *ButtonClass, *TextClass, *SliderClass;
+	class UClass *ButtonClass, *TextClass, *SliderClass, *ToggleClass;
 	float PreUserOmniCoupleRate;
 
 	FString JsonPrefix;

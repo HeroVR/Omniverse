@@ -42,12 +42,12 @@ To integrate Ominiverse SDK, you must follow these steps. Other interface/functi
 ```CS
 PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Omniverse"});  
 ```
-4. Config yourproject Engine.Input, add Omni X-Axis as MoveRight input, add Omni Y-Axis as MoveForward input. 
-5. Call UOVInterface::Init(...) on game start.
+4. Call UOVInterface::Init(...) on game start.
 ```C++
 UOVInterface::Init(1019, "01ec17dac7140c0fbe936ee128310000", "omni=1");
 ```
-5. Add UOmniControllerComponent to your ACharacter. Please config UOmniControllerComponent::Camera correctly. 
+5. Config yourproject Engine.Input, add Omni X-Axis as MoveRight input, add Omni Y-Axis as MoveForward input.
+6. Add UOmniControllerComponent to your ACharacter. Please config UOmniControllerComponent::Camera correctly. 
 UOmniControllerComponent need HDM camera to correct Omni harness orientation, make HDM work correctly when ACharacter's yaw changed by omni-harness turing.
 Three ways to config UOmniControllerComponent::Camera:  
     >a. by default, UOmniControllerComponentwill use the first UCameraComponent from owner ACharacter;  
@@ -59,9 +59,10 @@ Three ways to config UOmniControllerComponent::Camera:
     OmniControllerComponent->InitOmniDone.AddDynamic(this, &AOVSDKSampleUE4Character::OnInitOmniDone);
     //OmniControllerComponent->Camera = FirstPersonCameraComponent;
 ```
-6. Bind MoveForward and MoveRight in your character::SetupPlayerInputComponent(...) and implement MoveForward and MoveRight. You may already have done these :)
-
-7. Done. You can study OVSDKSampleUE4 if any problems.
+7. Add an individual USceneComponent as FirstPersonCameraComponent's parent, to compensate Omni harness turning.
+8. Set FirstPersonCameraComponent->bUsePawnControlRotation to false in VR mode.
+9. Bind MoveForward and MoveRight in your character::SetupPlayerInputComponent(...) and implement MoveForward and MoveRight. You may already have done these.
+10. Done. You can study OVSDKSampleUE4 if any problems.
 **********************************************************************
 ## Use Omniverse by UE4 blueprint
 1. Copy OVSDKSampleUE4/Plugins/Omniverse to your project's Plugins;
@@ -79,8 +80,11 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engi
 ```
 4. Call OVSDK.Init when game begin. (you can do it in GameInstance::Init)
 5. Config yourproject Engine.Input, add Omni X-Axis as MoveRight input, add Omni Y-Axis as MoveForward input. 
-6. Modify character blueprint, add OmniControllerComponent, config OmniControllerComponent's Camera property. Implement InputAxis MoveForward/MoveRight;
-7. Done. You can study OVSDKSampleUE4BP if any problems.
+6. Modify character blueprint, add OmniControllerComponent, config OmniControllerComponent's Camera property.;
+7. In character blueprint, add an individual USceneComponent as FirstPersonCameraComponent's parent, to compensate Omni harness turning.
+8. In character blueprint, set FirstPersonCameraComponent->bUsePawnControlRotation to false in VR mode.
+9. In character blueprint, implement InputAxis MoveForward/MoveRight. You may already have done these.
+10. Done. You can study OVSDKSampleUE4BP if any problems.
 **********************************************************************
 ## Use Omniverse by Unity
 1. Import Omniverse.unitypackage. (You can export from OVSDKSampleUnity)

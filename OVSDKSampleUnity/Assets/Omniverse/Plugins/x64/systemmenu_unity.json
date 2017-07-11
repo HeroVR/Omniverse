@@ -1,4 +1,4 @@
-﻿{
+{
   "y": "20",
   "w": "500",
   "h": "420",
@@ -49,20 +49,20 @@
       "cmd": "|Return to game|0|0"
     },
     {
-      "x": "-80",
-      "y": "-130",
+      "x": "25",
+      "y": "-128",
       "w": "400",
       "h": "50",
       "type": "Text",
       "cmd": "|<size=14><color=#FFFFFF>Move in HDM direction</color></size>|"
     },
     {
-      "name": "OmniCoupleRate",
-      "x": "80",
+      "name": "OmniCoupleMode",
+      "x": "-65",
       "y": "-130",
-      "w": "150",
-      "h": "50",
-      "type": "Slider",
+      "w": "30",
+      "h": "30",
+      "type": "Toggle",
       "cmd": ""
     }
   ]

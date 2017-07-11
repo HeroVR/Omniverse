@@ -36,6 +36,12 @@ class OVMenuItem
 			OVSDK.SetOmniCoupleRate(val);
 		}
 	}
+	public void OnToggleStateChange(bool state)
+	{
+		if (name == "OmniCoupleMode") {
+			OVSDK.SetOmniCoupleRate(state ? 1.0f : 0.0f);
+		}
+	}
 }
 
 public class OVMsgBoxMenu : OVMsgBox
@@ -57,28 +63,13 @@ public class OVMsgBoxMenu : OVMsgBox
 		for (int i = 0; i < count; ++i)
 		{
 			bool enable = i == (count - 1);
-			for (int j = 0; j < _AllMsgBoxJson[i]._Items.Count; ++j)
-			{
-				OVButton btn = _AllMsgBoxJson[i]._Items[j].go.GetComponent<OVButton>();
-				if (btn)
-                { 
-                    Image imag = btn.GetComponent<Image>();
-                    if (imag)
-                    {
-                        imag.raycastTarget = enable;
-                        Text[] text = imag.GetComponentsInChildren<Text>();
-                        if (text.Length > 0)
-                        {
-                            foreach(var K in text)
-                            {
-                                K.raycastTarget = enable;
-                            }
-                        }
 
-                    }
 
-				}
-			}
+            Collider col = _AllMsgBoxJson[i].GetComponent<Collider>();
+            if(col)
+            {
+                col.enabled = enable;
+            }
 		}
 	}
 
@@ -126,8 +117,7 @@ public class OVMsgBoxMenu : OVMsgBox
                    // OVUIEventListener.Get(item.go.gameObject).onClick += this.OnClick;
 
                 }
-				
-				if (def.items[i].type == "Slider")
+				else if (def.items[i].type == "Slider")
 				{
 					Slider slider = item.go.GetComponent<Slider>();
 					if (slider != null)
@@ -138,6 +128,19 @@ public class OVMsgBoxMenu : OVMsgBox
 							slider.value = OVSDK.GetOmniCoupleRate();
 						}
 						slider.onValueChanged.AddListener(item.OnSliderValueChange);
+					}
+				}
+				else if (def.items[i].type == "Toggle")
+				{
+					Toggle toggle = item.go.GetComponent<Toggle>();
+					if (toggle != null)
+					{
+						if (item.name == "OmniCoupleMode")
+						{
+							_PreOmniCoupleRate = OVSDK.GetUserOmniCoupleRate();
+							toggle.isOn = OVSDK.GetOmniCoupleRate() < 0.5f ? false : true;
+						}
+						toggle.onValueChanged.AddListener(item.OnToggleStateChange);
 					}
 				}
 			}

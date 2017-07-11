@@ -163,6 +163,12 @@ class OMNIVERSE_API UOVInterface : public UBlueprintFunctionLibrary, public FTic
 
 	UPROPERTY(BlueprintReadWrite, Category = "OVSDK")
 	TEnumAsByte<ERayVisibility::Type> RayVisibility;
+
+	UPROPERTY(BlueprintReadWrite, Category = "OVSDK")
+	FVector RayRelativeLocation;
+	
+	UPROPERTY(BlueprintReadWrite, Category = "OVSDK")
+	FRotator RayRelativeRotation;
 public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "UvInterfaceInstance", Keywords = "UvInterfaceInstance"), Category = "OVSDK")
 	static UOVInterface* GetInstance();

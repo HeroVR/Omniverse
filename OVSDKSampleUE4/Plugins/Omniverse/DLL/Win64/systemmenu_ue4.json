@@ -50,20 +50,20 @@
       "cmd": "|Return to game|0|0"
     },
     {
-      "x": "100",
-      "y": "400",
+      "x": "180",
+      "y": "395",
       "w": "400",
       "h": "50",
       "type": "Text",
       "cmd": "|Move in HDM dir|"
     },
     {
-      "name": "OmniCoupleRate",
-      "x": "350",
-      "y": "400",
-      "w": "150",
+      "name": "OmniCoupleMode",
+      "x": "120",
+      "y": "390",
+      "w": "50",
       "h": "50",
-      "type": "Slider",
+      "type": "Toggle",
       "cmd": ""
     }
   ]
