@@ -222,7 +222,7 @@ public class OmniMovementComponent : MonoBehaviour {
                 cameraReference.gameObject.AddComponent<SmoothMouseLook>();
                 Vector3 adjustedCameraPosition = cameraReference.localPosition;
                 adjustedCameraPosition.y = 1.5f;
-                cameraReference.position = adjustedCameraPosition;
+                cameraReference.localPosition = adjustedCameraPosition;
             }
             return;
         }
