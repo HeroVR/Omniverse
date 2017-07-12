@@ -1,4 +1,4 @@
-// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
+﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 #include "OmniversePrivatePCH.h"
 #include "OmniInputDevice.h"
 #include "SlateBasics.h"
@@ -48,23 +48,10 @@ void FOmniverseModule::StartupModule()
 	void *dll = FWindowsPlatformProcess::GetDllHandle(*dll_path);
 	if (dll)
 	{
-#pragma warning(disable:4191)
-		funcInit = (DllInit)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllInit"));
-		funcDrive = (DllDrive)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllDrive"));
-		funcGetDeviceInfo = (DllGetDeviceInfo)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetDeviceInfo"));
-		funcGetUserInfo = (DllGetUserInfo)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetUserInfo"));
-		funcGetOmniYawOffset = (DllGetOmniYawOffset)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetOmniYawOffset"));
-		funcBuy = (DllBuy)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllBuy"));
-		funcSendCommand = (DllSendCommand)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllSendCommand"));
-		funcIsGuest = (DllIsGuest)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllIsGuest"));
-		funcGetSysLang = (DllGetSysLang)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetSysLang"));
-		funcSaveGameData = (DllSaveGameData)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllSaveGameData"));
-		funcLoadGameData = (DllLoadGameData)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllLoadGameData"));
-#pragma warning(default:4191)
-		UE_LOG(LogTemp, Display, TEXT("OVSDK startup success!"));
+		extern bool InitDllFunctions(void *dll);
+		InitDllFunctions(dll);
 	}
-
-	if (NULL == funcInit) {
+	else {
 		UE_LOG(LogTemp, Error, TEXT("OVSDK load Omniverse.Functions.dll failed!"));
 	}
 }

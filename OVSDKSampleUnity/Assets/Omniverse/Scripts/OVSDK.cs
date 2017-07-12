@@ -702,9 +702,7 @@ public class OVSDK : MonoBehaviour
 
 	public static float GetOmniCoupleRate()
 	{
-		int coupleRate = Marshal.ReadInt32((IntPtr)((long)DllGetUserInfo() + 452));
-		int userCoupleRate = GetUserOmniCoupleRate();
-		return (float)(0.0001 * (userCoupleRate > 0 ? userCoupleRate - 1 : coupleRate));
+		return DllGetOmniCoupleRate();
 	}
 
 	public static int GetUserOmniCoupleRate()	{
@@ -713,7 +711,7 @@ public class OVSDK : MonoBehaviour
 
 	public static void SetOmniCoupleRate(float rate)
 	{
-		Marshal.WriteInt32((IntPtr)((long)DllGetUserInfo() + 456), (int)(10000*rate + 1));
+		DllSetOmniCoupleRate(rate);
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -745,6 +743,12 @@ public class OVSDK : MonoBehaviour
 
 	[DllImport("Omniverse.Functions")]
 	static extern float DllGetOmniYawOffset();
+
+	[DllImport("Omniverse.Functions")]
+	static extern float DllGetOmniCoupleRate();
+
+	[DllImport("Omniverse.Functions")]
+	static extern void DllSetOmniCoupleRate(float coupleRate);
 
 	[DllImport("Omniverse.Functions")]
 	static extern bool DllIsGuest();

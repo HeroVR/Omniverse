@@ -29,32 +29,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FBuyResult, FString, sItem, FStrin
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSaveGameData, int, retCode, FString, retMsg);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FLoadGameData, int, retCode, FString, retMsg, USaveGame*, data);
 
-
-typedef void (*DllCallback)(const char *name, int retCode, const char *result, unsigned resultLen, void *userData);
-typedef void (*DllInit)(int gameId, const char *gameKey, const char *params, DllCallback cb, void *userData);
-typedef void (*DllDrive)();
-typedef IPCDevice* (*DllGetDeviceInfo)();
-typedef IPCUser* (*DllGetUserInfo)();
-typedef float(*DllGetOmniYawOffset)();
-typedef void (*DllBuy)(const char *itemName, double price, const char *outTradeNo);
-typedef void (*DllSendCommand)(unsigned cmd, const char *data, unsigned len);
-typedef bool (*DllIsGuest)();
-typedef const char* (*DllGetSysLang)();
-typedef void (*DllSaveGameData)(const void *data, unsigned len);
-typedef void (*DllLoadGameData)();
-
-extern DllInit funcInit;
-extern DllDrive funcDrive;
-extern DllGetDeviceInfo funcGetDeviceInfo;
-extern DllGetUserInfo funcGetUserInfo;
-extern DllGetOmniYawOffset funcGetOmniYawOffset;
-extern DllBuy funcBuy;
-extern DllSendCommand funcSendCommand;
-extern DllIsGuest funcIsGuest;
-extern DllGetSysLang funcGetSysLang;
-extern DllSaveGameData funcSaveGameData;
-extern DllLoadGameData funcLoadGameData;
-
 class AOVMsgBox;
 class AOVRayActor;
 class AOVDlgBase;
@@ -130,6 +104,8 @@ class OMNIVERSE_API UOVInterface : public UBlueprintFunctionLibrary, public FTic
 
 	UFUNCTION(BlueprintCallable, Category = OVSDK)
 	static float GetOmniCoupleRate();
+
+	static void SetOmniCoupleRate(float coupleRate);
 
 	UFUNCTION(BlueprintCallable, Category = "OVSDK")
 	static void Buy(FString itemName, float price, FString outTradeNo);

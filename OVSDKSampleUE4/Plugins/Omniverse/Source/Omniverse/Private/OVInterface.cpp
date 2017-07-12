@@ -9,12 +9,30 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Runtime/UMG/Public/Components/WidgetComponent.h"
 
+//-------------------------------------------------------------------------------------------------------------------
+// Omniverse.Functions.dll
+typedef void(*DllCallback)(const char *name, int retCode, const char *result, unsigned resultLen, void *userData);
+typedef void(*DllInit)(int gameId, const char *gameKey, const char *params, DllCallback cb, void *userData);
+typedef void(*DllDrive)();
+typedef IPCDevice* (*DllGetDeviceInfo)();
+typedef IPCUser* (*DllGetUserInfo)();
+typedef float(*DllGetOmniYawOffset)();
+typedef float(*DllGetOmniCoupleRate)();
+typedef float(*DllSetOmniCoupleRate)(float coupleRate);
+typedef void(*DllBuy)(const char *itemName, double price, const char *outTradeNo);
+typedef void(*DllSendCommand)(unsigned cmd, const char *data, unsigned len);
+typedef bool(*DllIsGuest)();
+typedef const char* (*DllGetSysLang)();
+typedef void(*DllSaveGameData)(const void *data, unsigned len);
+typedef void(*DllLoadGameData)();
 
 DllInit funcInit = nullptr;
 DllDrive funcDrive = nullptr;
 DllGetDeviceInfo funcGetDeviceInfo = nullptr;
 DllGetUserInfo funcGetUserInfo = nullptr;
 DllGetOmniYawOffset funcGetOmniYawOffset = nullptr;
+DllGetOmniCoupleRate funcGetOmniCoupleRate = nullptr;
+DllSetOmniCoupleRate funcSetOmniCoupleRate = nullptr;
 DllBuy funcBuy = nullptr;
 DllSendCommand funcSendCommand = nullptr;
 DllIsGuest funcIsGuest = nullptr;
@@ -22,6 +40,34 @@ DllGetSysLang funcGetSysLang = nullptr;
 DllSaveGameData funcSaveGameData = nullptr;
 DllLoadGameData funcLoadGameData = nullptr;
 
+bool InitDllFunctions(void *dll)
+{
+#pragma warning(disable:4191)
+	funcInit = (DllInit)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllInit"));
+	funcDrive = (DllDrive)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllDrive"));
+	funcGetDeviceInfo = (DllGetDeviceInfo)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetDeviceInfo"));
+	funcGetUserInfo = (DllGetUserInfo)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetUserInfo"));
+	funcGetOmniYawOffset = (DllGetOmniYawOffset)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetOmniYawOffset"));
+	funcGetOmniCoupleRate = (DllGetOmniCoupleRate)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetOmniCoupleRate"));
+	funcSetOmniCoupleRate = (DllSetOmniCoupleRate)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllSetOmniCoupleRate"));
+	funcBuy = (DllBuy)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllBuy"));
+	funcSendCommand = (DllSendCommand)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllSendCommand"));
+	funcIsGuest = (DllIsGuest)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllIsGuest"));
+	funcGetSysLang = (DllGetSysLang)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetSysLang"));
+	funcSaveGameData = (DllSaveGameData)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllSaveGameData"));
+	funcLoadGameData = (DllLoadGameData)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllLoadGameData"));
+#pragma warning(default:4191)
+
+	if (NULL == funcInit) {
+		UE_LOG(LogTemp, Error, TEXT("OVSDK load Omniverse.Functions.dll interface failed!"));
+		return false;
+	}
+
+	UE_LOG(LogTemp, Display, TEXT("OVSDK load Omniverse.Functions.dll success!"));
+	return true;
+}
+
+//-------------------------------------------------------------------------------------------------------------------
 struct FBuyParam
 {
 	FString ItemName;
@@ -224,13 +270,19 @@ float UOVInterface::GetOmniCalibrationOffset() {
 	return OmniYawOffset;
 }
 
-float UOVInterface::GetOmniCoupleRate()
+float UOVInterface::GetOmniCoupleRate() 
 {
-	if (UserInfo) {
-		return 0.0001f * (UserInfo->nUserCoupleRate > 0 ? UserInfo->nUserCoupleRate - 1 : UserInfo->nCoupleRate);
+	if (funcGetOmniYawOffset) {
+		return funcGetOmniCoupleRate();
 	}
-
 	return 0;
+}
+
+void UOVInterface::SetOmniCoupleRate(float coupleRate) 
+{
+	if (funcSetOmniCoupleRate) {
+		funcSetOmniCoupleRate(coupleRate);
+	}	
 }
 
 void UOVInterface::Buy(FString itemName, float price, FString outTradeNo)

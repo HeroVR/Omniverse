@@ -165,8 +165,10 @@ bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FStri
 				USlider *sld = Cast<USlider>(widget->GetRootWidget());
 				if (sld)
 				{
-					PreUserOmniCoupleRate = UOVInterface::GetOmniCoupleRate();
-					sld->SetValue(PreUserOmniCoupleRate);
+					IPCUser *iu = UOVInterface::GetUserInfo();
+					PreUserOmniCoupleRate = iu != nullptr ? iu->nUserCoupleRate : 0;
+
+					sld->SetValue(UOVInterface::GetOmniCoupleRate());
 					sld->OnValueChanged.AddDynamic(&*mw, &UJsonWidget::OnSlide);
 				}
 			}
@@ -178,8 +180,10 @@ bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FStri
 				UCheckBox *toggle = Cast<UCheckBox>(widget->GetRootWidget());
 				if (toggle)
 				{
-					PreUserOmniCoupleRate = UOVInterface::GetOmniCoupleRate();
-					toggle->SetCheckedState(PreUserOmniCoupleRate < 0.5f ? ECheckBoxState::Unchecked : ECheckBoxState::Checked);
+					IPCUser *iu = UOVInterface::GetUserInfo();
+					PreUserOmniCoupleRate = iu != nullptr ? iu->nUserCoupleRate : 0;
+
+					toggle->SetCheckedState(UOVInterface::GetOmniCoupleRate() < 0.5f ? ECheckBoxState::Unchecked : ECheckBoxState::Checked);
 					toggle->OnCheckStateChanged.AddDynamic(&*mw, &UJsonWidget::OnToggle);
 				}
 			}
@@ -278,9 +282,13 @@ void AOVDlgJson::TryClose(const FString &name)
 
 void AOVDlgJson::EndPlay(const EEndPlayReason::Type reason)
 {
-	if (PreUserOmniCoupleRate > -0.01f
-		&& UOVInterface::GetUserInfo()->nUserCoupleRate > 0
-		&& (3 < FMath::Abs((PreUserOmniCoupleRate * 10000) - (UOVInterface::GetUserInfo()->nUserCoupleRate - 1)))) {
+	IPCUser *iu = UOVInterface::GetUserInfo();
+	int currUserOmniCoupleRate = iu != nullptr ? iu->nUserCoupleRate : 0;
+
+	if (PreUserOmniCoupleRate >= 0
+		&& currUserOmniCoupleRate > 0
+		&& abs(currUserOmniCoupleRate - PreUserOmniCoupleRate) > 3) 
+	{
 		UOVInterface::SendCommand(14, "", 0);
 	}
 	UOVInterface::SendCommand(15, DlgJsonName, DlgJsonName.Len());
@@ -317,18 +325,12 @@ void UJsonWidget::OnClick()
 
 void UJsonWidget::OnSlide(float val)
 {
-	IPCUser *ui = UOVInterface::GetUserInfo();
-	if (ui)	{
-		ui->nUserCoupleRate = val * 10000 + 1;
-	}
+	UOVInterface::SetOmniCoupleRate(val);
 }
 
 void UJsonWidget::OnToggle(bool state)
 {
-	IPCUser *ui = UOVInterface::GetUserInfo();
-	if (ui) {
-		ui->nUserCoupleRate = (state ? 1.0f : 0.0f) * 10000 + 1;
-	}
+	UOVInterface::SetOmniCoupleRate(state ? 1.0f : 0.0f);
 }
 
 char* AOVDlgJson::LoadFile(const char *path)
