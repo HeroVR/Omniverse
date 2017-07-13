@@ -125,7 +125,7 @@ public class OmniMovementComponent : MonoBehaviour {
 
     void Start()
     {
-        Debug.Log(System.DateTime.Now.ToLongTimeString() + ": OmniMovementComponent- VERSION NUMBER 1.5");
+        Debug.Log(System.DateTime.Now.ToLongTimeString() + ": OmniMovementComponent- Omniverse SDK Version 1.0.01");
 
         OmniInitialize();
 
