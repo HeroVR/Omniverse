@@ -159,7 +159,7 @@ public class OmniMovementComponent : MonoBehaviour {
     protected float ComputeAngleBetweenControllerAndCamera()
     {
         float cameraYaw = cameraReference.rotation.eulerAngles.y;
-        float adjustedOmniYaw = currentOmniYaw - omniOffset;
+        float adjustedOmniYaw = currentOmniYaw - omniOffset + transform.rotation.eulerAngles.y;
         float angleBetweenControllerAndCamera = 0f;
         angleBetweenControllerAndCamera = Mathf.Abs(cameraYaw - adjustedOmniYaw) % 360;
         angleBetweenControllerAndCamera = angleBetweenControllerAndCamera > 180 ? 360 - angleBetweenControllerAndCamera : angleBetweenControllerAndCamera;
@@ -456,7 +456,7 @@ public class OmniMovementComponent : MonoBehaviour {
 
 
         //calculate forward rotation
-        forwardRotation = (currentOmniYaw - omniOffset) + (angleBetweenOmniAndCamera * couplingPercentage);
+        forwardRotation = (currentOmniYaw - omniOffset + transform.rotation.eulerAngles.y) + (angleBetweenOmniAndCamera * couplingPercentage);
 
         //display forward rotation defined by our coupling percentage
         dummyObject.rotation = Quaternion.Euler(0, forwardRotation, 0);
