@@ -19,7 +19,10 @@ UOmniControllerComponent::UOmniControllerComponent()
 	bStartYawCorrected = false;
 	StartYawDiff = 0;
 	BackwardMovementMod = 0.75f;
+
+	MovementDirection = FRotator(0.0f, 0.0f, 0.0f);
 }
+
 
 // Called every frame
 void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
@@ -56,8 +59,6 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 				UOmniControllerPluginFunctionLibrary::GetYaw(RawOmniYaw);
 				CouplingPercentage = UOVInterface::GetOmniCoupleRate();
 
-				//UOVInterface::GetOmniCalibrationOffset();
-
 				if (RawOmniYaw > 180) {
 					OmniYaw = RawOmniYaw - 360 - OmniYawOffset;
 				}
@@ -71,19 +72,44 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 				}
 
 				float cameraYaw = Camera ? Camera->GetComponentTransform().Rotator().Yaw : 0;
-				CurrYaw = cameraYaw * CouplingPercentage + (OmniYaw + StartYawDiff) * (1.0f - CouplingPercentage);
 
-				// Set ACharacter Yaw
+				//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+				//Calculating the Angle Between the Camera and the Omni
+
 				APlayerController *pc = CastChecked<APlayerController>(controller);
-				pc->SetControlRotation(FRotator(pc->RotationInput.Pitch, CurrYaw, pc->RotationInput.Roll));
+				APawn* character = nullptr;
+				float CharacterRotation = 0.0f;
+
+				if (IsValid(pc))
+				{
+					APawn* character = pc->GetPawn();
+					if(IsValid(character))
+						CharacterRotation = character->GetActorTransform().Rotator().Yaw;
+				}
+
+				float AdjustedOmniYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation);
+				float AngleBetweenCameraAndOmni = (int)FMath::Abs(cameraYaw - AdjustedOmniYaw) % 360;
+
+				AngleBetweenCameraAndOmni = AngleBetweenCameraAndOmni > 180 ? 360 - AngleBetweenCameraAndOmni : AngleBetweenCameraAndOmni;
+
+				float sign = ((cameraYaw - AdjustedOmniYaw) >= 0 && (cameraYaw - AdjustedOmniYaw <= 180)) ||
+					((cameraYaw - AdjustedOmniYaw) <= -180 && (cameraYaw - AdjustedOmniYaw) >= -360) ? 1 : -1;
+
+				AngleBetweenCameraAndOmni *= sign;
+
+				//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+				CurrYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation) + (AngleBetweenCameraAndOmni * CouplingPercentage);
 
 				if (Camera != nullptr) {
-					Camera->GetAttachParent()->SetRelativeRotation(FQuat(FRotator(0, -pawn->GetActorRotation().Yaw + StartYawDiff, 0)));
+					MovementDirection = FRotator(0.0f, CurrYaw, 0.0f);
 				}				
 			}
 		}
 	}	
 }
+
 
 void UOmniControllerComponent::CheckOmniState()
 {
@@ -101,6 +127,7 @@ void UOmniControllerComponent::CheckOmniState()
 		OmniYawOffset = UOVInterface::GetOmniCalibrationOffset();
 	}
 }
+
 
 bool UOmniControllerComponent::IsDeveloperMode() const
 {
