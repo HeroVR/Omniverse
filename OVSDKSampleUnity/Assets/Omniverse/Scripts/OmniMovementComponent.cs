@@ -125,7 +125,7 @@ public class OmniMovementComponent : MonoBehaviour {
 
     void Start()
     {
-        Debug.Log(System.DateTime.Now.ToLongTimeString() + ": OmniMovementComponent- Omniverse SDK Version 1.0.01");
+        Debug.Log(System.DateTime.Now.ToLongTimeString() + ": OmniMovementComponent- Omniverse SDK Version 2.0.02");
 
         OmniInitialize();
 
@@ -222,7 +222,7 @@ public class OmniMovementComponent : MonoBehaviour {
                 cameraReference.gameObject.AddComponent<SmoothMouseLook>();
                 Vector3 adjustedCameraPosition = cameraReference.localPosition;
                 adjustedCameraPosition.y = 1.5f;
-                cameraReference.position = adjustedCameraPosition;
+                cameraReference.localPosition = adjustedCameraPosition;
             }
             return;
         }
