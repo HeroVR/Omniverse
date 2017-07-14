@@ -142,16 +142,40 @@ void AOVSDKSampleUE4Character::OnResetVR()
 
 void AOVSDKSampleUE4Character::MoveForward(float Value)
 {
-	if (Value != 0.0f)	{
-		AddMovementInput(GetActorForwardVector(), Value);
+	if (Value == 0.0f)
+		return;
+	
+	bool OmniFound = false;
+	FRotator rotation(ForceInit);
+	rotation.Yaw = FirstPersonCameraComponent->ComponentToWorld.GetRotation().Rotator().Yaw;
+	FVector direction = rotation.Vector();
+	
+	UOmniControllerPluginFunctionLibrary::IsOmniFound(OmniFound);
+	
+	if(OmniFound)
+	{
+		if(Value < 0)
+			Value *= OmniControllerComponent->BackwardMovementMod;
+		
+		direction = FRotationMatrix(OmniControllerComponent->GetCurrentMovementDirection()).GetScaledAxis(EAxis::X);
 	}
+	AddMovementInput(direction, Value);			
 }
 
 void AOVSDKSampleUE4Character::MoveRight(float Value)
 {
-	if (Value != 0.0f)	{
-		AddMovementInput(GetActorRightVector(), Value);
-	}
+	if (Value == 0.0f)
+		return;
+
+	bool OmniFound = false;
+	FVector direction = FirstPersonCameraComponent->GetRightVector();
+
+	UOmniControllerPluginFunctionLibrary::IsOmniFound(OmniFound);
+
+	if(OmniFound)
+		direction = FRotationMatrix(OmniControllerComponent->GetCurrentMovementDirection()).GetScaledAxis(EAxis::Y);
+
+	AddMovementInput(direction, Value);
 }
 
 void AOVSDKSampleUE4Character::Turn(float Rate)
