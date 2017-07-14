@@ -31,7 +31,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "OmniControllerComponent")
 	FInitOmniDone InitOmniDone;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly)
 	float CouplingPercentage;		// 0: use harness dir(Decouple mode); 1: HMD dir(Couple mode); 0~1: blend between harness and HMD (SoftCouple mode);
 
 	UPROPERTY(BlueprintReadWrite)
@@ -47,11 +47,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "OmniControllerComponent")
 	bool IsDeveloperMode() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "OmniControllerComponent")
+		float GetRawOmniYaw() { return RawOmniYaw; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "OmniControllerComponent")
+		float GetAdjustedOmniYaw() { return OmniYaw; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "OmniControllerComponent")
+		float GetCurrentMovementYaw() { return CurrYaw; };
+
+	FRotator GetCurrentMovementDirection() { return MovementDirection; };
+
 protected:
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TEnumAsByte<EOmniState::Type> OmniState;
 
-	void CheckOmniState();	
+	void CheckOmniState();
+
 
 protected:
 	float RawOmniYaw;				// Harness Yaw in Omni-Device coordination;	
@@ -61,4 +73,6 @@ protected:
 	float StartYawDiff;				// Yaw difference between PlayerStart and harness;
 
 	float CurrYaw;					// Owner current orientation;
+
+	FRotator MovementDirection;
 };
