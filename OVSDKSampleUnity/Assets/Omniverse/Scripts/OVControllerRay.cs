@@ -150,6 +150,11 @@ public class OVControllerRay
                 _OVSDKCamera.enabled = false;
                 Camera.main.cullingMask &= ~_nCollideLayerMask;
             }
+			
+			if (_OVSDKCamera == null)
+			{
+				Debug.Log("CreateOVSDKCamera failed. prefab = " + prefab + ".");
+			}
         }
     }
     public PointerEventData _PointerEventData = new PointerEventData(null);

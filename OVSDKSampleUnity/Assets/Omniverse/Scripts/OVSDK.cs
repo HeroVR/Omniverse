@@ -721,6 +721,9 @@ public class OVSDK : MonoBehaviour
 	static extern bool DllInit(int nGameId, string sGameKey, string sParam, DllCallback cb, IntPtr pUserData);
 
 	[DllImport("Omniverse.Functions")]
+	static extern void DllShutdown();
+
+	[DllImport("Omniverse.Functions")]
 	public static extern bool DllLaunchGame(string exe, string workdir, string cmdline, int game_id, int prepare_time);   //启动游戏，传入参数
 
 	[DllImport("Omniverse.Functions")]
@@ -823,6 +826,7 @@ public class OVSDK : MonoBehaviour
 	}
 	void OnDestroy()
 	{
-
+		Debug.Log("OVSDK shutdown.");
+		DllShutdown();
 	}
 }
