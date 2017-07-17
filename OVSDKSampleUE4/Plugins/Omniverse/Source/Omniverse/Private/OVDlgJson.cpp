@@ -6,7 +6,7 @@
 #pragma warning(disable: 4996)
 
 AOVDlgJson::AOVDlgJson(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer), PreUserOmniCoupleRate(-1)
+	: Super(ObjectInitializer), PreUserOmniCoupleRate(0)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickEnabled(true);
@@ -58,7 +58,7 @@ bool AOVDlgJson::LoadJson(const char *jsonFilePrefix)
 	TSharedPtr<FJsonObject> values;
 	if (FJsonSerializer::Deserialize(reader, values))
 	{
-		uint32 x = 0, y = 0, w = 0, h = 0, msgid = 0, direct_close = 0;
+		uint32 x = 0, y = 0, w = 0, h = 0, msgid = 0;
 		values->TryGetStringField("name", DlgJsonName);
 		values->TryGetNumberField("w", w);
 		values->TryGetNumberField("h", h);
@@ -82,7 +82,6 @@ bool AOVDlgJson::LoadJson(const char *jsonFilePrefix)
 			jo.TryGetNumberField("w", w);
 			jo.TryGetNumberField("h", h);
 			jo.TryGetNumberField("msgid", msgid);
-			jo.TryGetNumberField("close", direct_close);
 
 			FString name, type, style, cmd;
 			jo.TryGetStringField("name", name);
@@ -90,14 +89,14 @@ bool AOVDlgJson::LoadJson(const char *jsonFilePrefix)
 			jo.TryGetStringField("style", style);
 			jo.TryGetStringField("cmd", cmd);
 
-			NewWidget(panel, name, type, x, y, w, h, msgid, (0 != direct_close), style, cmd);
+			NewWidget(panel, name, type, x, y, w, h, msgid, style, cmd, jo);
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Json " + values[i]->AsObject()->);
 		}
 	}
 	return true;
 }
 
-bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FString &type, int x, int y, int w, int h, int MsgId, bool DirectClose, const FString &style, const FString &cmd)
+bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FString &type, int x, int y, int w, int h, int MsgId, const FString &style, const FString &cmd, const FJsonObject &jo)
 {
 	TSubclassOf<class UObject> clazz = TextClass;
 	if (type == "Button") {
@@ -144,12 +143,18 @@ bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FStri
 		mw->Name = name;
 		mw->Cmd = cmd;
 		mw->MsgId = MsgId;
-		mw->DirectClose = DirectClose;
 
 		UButton *btn = nullptr;
 		UTextBlock *txtWidget = nullptr;
 		if (type == "Button") 
 		{
+			int direct_close;
+			if (jo.TryGetNumberField("close", direct_close)) {
+				mw->WidgetData.DataForButton.DirectClose = (0 != direct_close);
+			}
+			else {
+				mw->WidgetData.DataForButton.DirectClose = false;
+			}
 			if (nullptr != (btn = Cast<UButton>(widget->GetRootWidget())))	{
 				txtWidget = Cast<UTextBlock>(btn->GetChildAt(0));
 			}
@@ -165,8 +170,7 @@ bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FStri
 				USlider *sld = Cast<USlider>(widget->GetRootWidget());
 				if (sld)
 				{
-					IPCUser *iu = UOVInterface::GetUserInfo();
-					PreUserOmniCoupleRate = iu != nullptr ? iu->nUserCoupleRate : 0;
+					PreUserOmniCoupleRate = UOVInterface::GetUserOmniCoupleRate();
 
 					sld->SetValue(UOVInterface::GetOmniCoupleRate());
 					sld->OnValueChanged.AddDynamic(&*mw, &UJsonWidget::OnSlide);
@@ -180,8 +184,7 @@ bool AOVDlgJson::NewWidget(UPanelWidget *panel, const FString &name, const FStri
 				UCheckBox *toggle = Cast<UCheckBox>(widget->GetRootWidget());
 				if (toggle)
 				{
-					IPCUser *iu = UOVInterface::GetUserInfo();
-					PreUserOmniCoupleRate = iu != nullptr ? iu->nUserCoupleRate : 0;
+					PreUserOmniCoupleRate = UOVInterface::GetUserOmniCoupleRate();
 
 					toggle->SetCheckedState(UOVInterface::GetOmniCoupleRate() < 0.5f ? ECheckBoxState::Unchecked : ECheckBoxState::Checked);
 					toggle->OnCheckStateChanged.AddDynamic(&*mw, &UJsonWidget::OnToggle);
@@ -282,12 +285,8 @@ void AOVDlgJson::TryClose(const FString &name)
 
 void AOVDlgJson::EndPlay(const EEndPlayReason::Type reason)
 {
-	IPCUser *iu = UOVInterface::GetUserInfo();
-	int currUserOmniCoupleRate = iu != nullptr ? iu->nUserCoupleRate : 0;
-
-	if (PreUserOmniCoupleRate >= 0
-		&& currUserOmniCoupleRate > 0
-		&& abs(currUserOmniCoupleRate - PreUserOmniCoupleRate) > 3) 
+	uint32 currUserOmniCoupleRate = UOVInterface::GetUserOmniCoupleRate();
+	if (currUserOmniCoupleRate != PreUserOmniCoupleRate)
 	{
 		UOVInterface::SendCommand(14, "", 0);
 	}
@@ -314,7 +313,7 @@ void AOVDlgJson::Tick(float DeltaTime)
 
 void UJsonWidget::OnClick()
 {
-	if (DirectClose) {
+	if (WidgetData.DataForButton.DirectClose) {
 		GWorld->DestroyActor(Dlg);
 	}
 	else {
@@ -330,7 +329,7 @@ void UJsonWidget::OnSlide(float val)
 
 void UJsonWidget::OnToggle(bool state)
 {
-	UOVInterface::SetOmniCoupleRate(state ? 1.0f : 0.0f);
+	UOVInterface::SetOmniCoupleMode(state);
 }
 
 char* AOVDlgJson::LoadFile(const char *path)

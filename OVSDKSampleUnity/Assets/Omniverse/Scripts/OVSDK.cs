@@ -69,8 +69,12 @@ public class OVSDK : MonoBehaviour
 		public int nUserProp;           //for internal usage;
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
 		public string sConsolePath;     //for internal usage;
-		[MarshalAs(UnmanagedType.U4)]
-		public int nCoupleRate, nUserCoupleRate; //Omni couple rate (0: decoupled, 10000: coupled)
+
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+		public char[] nCoupleRate;      //Omni couple rate data of default
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+		public char[] nUserCoupleRate;  //Omni couple rate setting about user
+
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 60)]
 		string sReserved;               //for internal usage;
 
@@ -705,13 +709,18 @@ public class OVSDK : MonoBehaviour
 		return DllGetOmniCoupleRate();
 	}
 
-	public static int GetUserOmniCoupleRate()	{
-		return Marshal.ReadInt32((IntPtr)((long)DllGetUserInfo() + 456));
+	public static UInt32 GetUserOmniCoupleRate()
+	{
+		return DllGetUserOmniCoupleRate();
 	}
 
 	public static void SetOmniCoupleRate(float rate)
 	{
 		DllSetOmniCoupleRate(rate);
+	}
+	public static void SetOmniCoupleMode(bool useCoupleMode)
+	{
+		DllSetOmniCoupleMode(useCoupleMode);
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -751,7 +760,13 @@ public class OVSDK : MonoBehaviour
 	static extern float DllGetOmniCoupleRate();
 
 	[DllImport("Omniverse.Functions")]
+	static extern UInt32 DllGetUserOmniCoupleRate();
+
+	[DllImport("Omniverse.Functions")]
 	static extern void DllSetOmniCoupleRate(float coupleRate);
+
+	[DllImport("Omniverse.Functions")]
+	static extern void DllSetOmniCoupleMode(bool useCoupleMode);
 
 	[DllImport("Omniverse.Functions")]
 	static extern bool DllIsGuest();

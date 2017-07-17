@@ -58,7 +58,8 @@ struct IPCUser
 	char sBillingMode[32];          //Ticket mode, "timing", "timingreal", "direct_game", "shiyu_coin", "game_auth", "timescount";
 	Uint32 nUserProp;               //for internal usage;
 	char sConsolePath[128];         //for internal usage;
-	Sint32 nCoupleRate, nUserCoupleRate; //Omni couple rate (0: decoupled, 10000: coupled)
+	unsigned char nCoupleRate[4];   //Omni couple rate setting for default
+	unsigned char nUserCoupleRate[4];//Omni couple rate setting about user
 	char sReserved[60];             //for internal usage;
 	char sQrcode[64];               //The omniverse trade number for this game ticket;
 	char sWeb2d[128];               //for internal usage;

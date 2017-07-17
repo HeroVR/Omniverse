@@ -15,9 +15,16 @@ public:
 	UUserWidget *Widget;
 	FString Name, Cmd;
 	int MsgId;
-	bool DirectClose, DynaText;
+	bool DynaText;
 	UTextBlock *TxtWidget;	
 	AOVDlgJson *Dlg;
+	union
+	{
+		struct
+		{
+			bool DirectClose;
+		} DataForButton;
+	} WidgetData;
 
 	UFUNCTION()
 	void OnClick();
@@ -47,13 +54,13 @@ class OMNIVERSE_API AOVDlgJson : public AOVDlgBase
 	static char* LoadFile(const char *path);
 protected:
 	class UClass *ButtonClass, *TextClass, *SliderClass, *ToggleClass;
-	int PreUserOmniCoupleRate;
+	uint32 PreUserOmniCoupleRate;
 
 	FString JsonPrefix;
 	FString DlgJsonName;
 	TArray<UJsonWidget*> JsonWidgets;
 
-	bool NewWidget(UPanelWidget *panel, const FString &name, const FString &type, int x, int y, int w, int h, int MsgId, bool DirectClose, const FString &style, const FString &cmd);
+	bool NewWidget(UPanelWidget *panel, const FString &name, const FString &type, int x, int y, int w, int h, int MsgId, const FString &style, const FString &cmd, const FJsonObject &jo);
 	UJsonWidget* LookupWidget(FString name);
 	bool UpdateText(UTextBlock *txtWidget, const FString &cmd);
 

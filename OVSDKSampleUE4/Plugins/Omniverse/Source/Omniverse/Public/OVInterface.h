@@ -105,7 +105,9 @@ class OMNIVERSE_API UOVInterface : public UBlueprintFunctionLibrary, public FTic
 	UFUNCTION(BlueprintCallable, Category = OVSDK)
 	static float GetOmniCoupleRate();
 
+	static uint32 GetUserOmniCoupleRate();
 	static void SetOmniCoupleRate(float coupleRate);
+	static void SetOmniCoupleMode(bool useCoupleMode);
 
 	UFUNCTION(BlueprintCallable, Category = "OVSDK")
 	static void Buy(FString itemName, float price, FString outTradeNo);

@@ -18,7 +18,9 @@ typedef IPCDevice* (*DllGetDeviceInfo)();
 typedef IPCUser* (*DllGetUserInfo)();
 typedef float(*DllGetOmniYawOffset)();
 typedef float(*DllGetOmniCoupleRate)();
+typedef uint32(*DllGetUserOmniCoupleRate)();
 typedef float(*DllSetOmniCoupleRate)(float coupleRate);
+typedef float(*DllSetOmniCoupleMode)(bool useCoupleMode);
 typedef void(*DllBuy)(const char *itemName, double price, const char *outTradeNo);
 typedef void(*DllSendCommand)(unsigned cmd, const char *data, unsigned len);
 typedef bool(*DllIsGuest)();
@@ -32,7 +34,9 @@ DllGetDeviceInfo funcGetDeviceInfo = nullptr;
 DllGetUserInfo funcGetUserInfo = nullptr;
 DllGetOmniYawOffset funcGetOmniYawOffset = nullptr;
 DllGetOmniCoupleRate funcGetOmniCoupleRate = nullptr;
+DllGetUserOmniCoupleRate funcGetUserOmniCoupleRate = nullptr;
 DllSetOmniCoupleRate funcSetOmniCoupleRate = nullptr;
+DllSetOmniCoupleMode funcSetOmniCoupleMode = nullptr;
 DllBuy funcBuy = nullptr;
 DllSendCommand funcSendCommand = nullptr;
 DllIsGuest funcIsGuest = nullptr;
@@ -49,7 +53,9 @@ bool InitDllFunctions(void *dll)
 	funcGetUserInfo = (DllGetUserInfo)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetUserInfo"));
 	funcGetOmniYawOffset = (DllGetOmniYawOffset)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetOmniYawOffset"));
 	funcGetOmniCoupleRate = (DllGetOmniCoupleRate)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetOmniCoupleRate"));
+	funcGetUserOmniCoupleRate = (DllGetUserOmniCoupleRate)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllGetUserOmniCoupleRate"));
 	funcSetOmniCoupleRate = (DllSetOmniCoupleRate)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllSetOmniCoupleRate"));
+	funcSetOmniCoupleMode = (DllSetOmniCoupleMode)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllSetOmniCoupleMode"));
 	funcBuy = (DllBuy)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllBuy"));
 	funcSendCommand = (DllSendCommand)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllSendCommand"));
 	funcIsGuest = (DllIsGuest)FWindowsPlatformProcess::GetDllExport(dll, TEXT("DllIsGuest"));
@@ -272,8 +278,16 @@ float UOVInterface::GetOmniCalibrationOffset() {
 
 float UOVInterface::GetOmniCoupleRate() 
 {
-	if (funcGetOmniYawOffset) {
+	if (funcGetOmniCoupleRate) {
 		return funcGetOmniCoupleRate();
+	}
+	return 0;
+}
+
+uint32 UOVInterface::GetUserOmniCoupleRate()
+{
+	if (funcGetUserOmniCoupleRate) {
+		return funcGetUserOmniCoupleRate();
 	}
 	return 0;
 }
@@ -283,6 +297,13 @@ void UOVInterface::SetOmniCoupleRate(float coupleRate)
 	if (funcSetOmniCoupleRate) {
 		funcSetOmniCoupleRate(coupleRate);
 	}	
+}
+
+void UOVInterface::SetOmniCoupleMode(bool useCoupleMode)
+{
+	if (funcSetOmniCoupleMode) {
+		funcSetOmniCoupleMode(useCoupleMode);
+	}
 }
 
 void UOVInterface::Buy(FString itemName, float price, FString outTradeNo)

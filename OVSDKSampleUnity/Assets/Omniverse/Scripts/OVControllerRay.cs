@@ -44,7 +44,7 @@ public class OVControllerRay
 
    // public Camera _MainCamera;
  //   bool _bMainCameraCullingMask = false;
-  //  int _nMainCameraCullingMask = 0;
+    int _nMainCameraCullingMask = 0;
 
     public Camera _OVSDKCamera;
 
@@ -128,11 +128,19 @@ public class OVControllerRay
 				CreateOVSDKCamera();
 			}
 			_OVSDKCamera.enabled = true;
-		}
+            _nMainCameraCullingMask = Camera.main.cullingMask;
+            Camera.main.cullingMask &= ~_nCollideLayerMask;
+        }
 		else
 		{
 			_OVSDKCamera.enabled = false;
-		}
+            Camera.main.cullingMask = _nMainCameraCullingMask;
+            foreach(RayData i in _Ray)
+            {
+                i.line.gameObject.SetActive(false);
+                i.spark.SetActive(false);
+            }
+        }
 	}
 
 
@@ -148,13 +156,8 @@ public class OVControllerRay
                 _OVSDKCamera.cullingMask = _nCollideLayerMask; ;
                 _OVSDKCamera.clearFlags = CameraClearFlags.Depth;
                 _OVSDKCamera.enabled = false;
-                Camera.main.cullingMask &= ~_nCollideLayerMask;
+
             }
-			
-			if (_OVSDKCamera == null)
-			{
-				Debug.Log("CreateOVSDKCamera failed. prefab = " + prefab + ".");
-			}
         }
     }
     public PointerEventData _PointerEventData = new PointerEventData(null);
@@ -643,6 +646,7 @@ public class OVControllerRay
     {
         if (index < 0 || device_index < 0)
         {
+            _Ray[index].line.gameObject.SetActive(false);
             return;
         }
 

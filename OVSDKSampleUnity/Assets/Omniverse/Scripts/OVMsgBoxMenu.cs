@@ -39,7 +39,7 @@ class OVMenuItem
 	public void OnToggleStateChange(bool state)
 	{
 		if (name == "OmniCoupleMode") {
-			OVSDK.SetOmniCoupleRate(state ? 1.0f : 0.0f);
+			OVSDK.SetOmniCoupleMode(state);
 		}
 	}
 }
@@ -53,7 +53,7 @@ public class OVMsgBoxMenu : OVMsgBox
 
 	List<OVMenuItem> _Items = new List<OVMenuItem>();
 	float _UpdateTimer = 0;
-	int _PreOmniCoupleRate = -1;
+	UInt32 _PreOmniCoupleRate = 0;
 
 	public static List<OVMsgBoxMenu> _AllMsgBoxJson = new List<OVMsgBoxMenu>();
 
@@ -111,8 +111,8 @@ public class OVMsgBoxMenu : OVMsgBox
 			if (item != null)
 			{
 				if (def.items[i].type == "Button")	{
-
-                    OVButton btn = item.go.gameObject.GetComponent<OVButton>();
+					item.directClose = (0 != def.items[i].close);
+					OVButton btn = item.go.gameObject.GetComponent<OVButton>();
                     btn.m_OnClick.AddListener(delegate(){ this.OnClick(item.go.gameObject); });
                    // OVUIEventListener.Get(item.go.gameObject).onClick += this.OnClick;
 
@@ -319,7 +319,6 @@ public class OVMsgBoxMenu : OVMsgBox
 			item.cmd = def.cmd;
 			item.name = def.name;
 			item.msgId = def.msgid;
-			item.directClose = (0 != def.close);
 
 			// Rect
 			ApplyTransRect(go.transform as RectTransform, def.x, def.y, def.w, def.h, def.rot);
