@@ -68,7 +68,7 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 
 				if (bAutoCorrectStartYaw && !bStartYawCorrected) {
 					bStartYawCorrected = true;
-					StartYawDiff = pawn->GetActorRotation().Yaw - OmniYaw;	//difference between Vive and Game
+					//StartYawDiff = pawn->GetActorRotation().Yaw - OmniYaw;	//difference between Vive and Game
 				}
 
 				float cameraYaw = Camera ? Camera->GetComponentTransform().Rotator().Yaw : 0;
@@ -102,12 +102,33 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 
 				CurrYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation) + (AngleBetweenCameraAndOmni * CouplingPercentage);
 
-				if (Camera != nullptr) {
-					MovementDirection = FRotator(0.0f, CurrYaw, 0.0f);
-				}				
-			}
+				if (!StartYawSet)
+				{
+					APawn* character = pc->GetPawn();
+
+					if (IsValid(character))
+					{
+						// Only want to set this rotation once. Causes motion sickness if allowed to set on Tick.
+
+						StartYawSet = true;
+						float CameraForwardYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation) + (AngleBetweenCameraAndOmni);
+						float CameraOffsetFromCharacter = character->GetActorTransform().Rotator().Yaw - CameraForwardYaw;
+
+						FRotator CameraOffsetRotator = FRotator(ForceInit);
+						CameraOffsetRotator.Yaw = CameraOffsetFromCharacter;
+
+						FRotator newRotation = FRotator(0.0f, 0.0f, 0.0f);
+						newRotation = UKismetMathLibrary::ComposeRotators(CameraOffsetRotator, pc->GetControlRotation());
+
+						pc->SetControlRotation(newRotation);
+					}
+				}
+
+				MovementDirection = FRotator(0.0f, CurrYaw, 0.0f);
+			}				
 		}
-	}	
+	}
+
 }
 
 
