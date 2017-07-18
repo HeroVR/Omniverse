@@ -73,6 +73,9 @@ protected:
 	float StartYawDiff;				// Yaw difference between PlayerStart and harness;
 
 	float CurrYaw;					// Owner current orientation;
+	
+	bool StartYawSet;				// Says whether or not the Start Yaw has been set. Makes sure the character is facing Forward.
+							// Gets set in the TickComponent(...) function.
 
 	FRotator MovementDirection;
 };
