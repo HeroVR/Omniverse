@@ -41,7 +41,7 @@ public:
 	bool bAutoCorrectStartYaw;		// Auto-correct harness to ACharacter's orientation on start;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin="0.0", UIMax="1.0"))
-	float BackwardMovementMod;		//With the CBM (Cadence Based Movement), the Backwards movement speed is very fast
+	float BackwardMovementMultiplier;	//With the CBM (Cadence Based Movement), the Backwards movement speed is very fast
 						//Set this value to slow down Backwards Movement. [0,1]
 						
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (UIMin = "0.0", UIMax = "1.0"))
