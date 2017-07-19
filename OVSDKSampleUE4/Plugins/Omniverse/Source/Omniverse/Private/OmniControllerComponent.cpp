@@ -19,7 +19,9 @@ UOmniControllerComponent::UOmniControllerComponent()
 	bStartYawCorrected = false;
 	StartYawSet = false;
 	StartYawDiff = 0;
-	BackwardMovementMod = 0.75f;
+	BackwardMovementMultiplier = 0.40f;
+	StrafeSpeedMultiplier = 1.0f;
+	AdjustedOmniYaw = 0.0f;
 
 	MovementDirection = FRotator(0.0f, 0.0f, 0.0f);
 }
