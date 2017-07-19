@@ -155,7 +155,7 @@ void AOVSDKSampleUE4Character::MoveForward(float Value)
 	if(OmniFound)
 	{
 		if(Value < 0)
-			Value *= OmniControllerComponent->BackwardMovementMod;
+			Value *= OmniControllerComponent->GetBackwardMovementMod();
 		
 		direction = FRotationMatrix(OmniControllerComponent->GetCurrentMovementDirection()).GetScaledAxis(EAxis::X);
 	}
@@ -172,8 +172,12 @@ void AOVSDKSampleUE4Character::MoveRight(float Value)
 
 	UOmniControllerPluginFunctionLibrary::IsOmniFound(OmniFound);
 
-	if(OmniFound)
+	if (OmniFound)
+	{
 		direction = FRotationMatrix(OmniControllerComponent->GetCurrentMovementDirection()).GetScaledAxis(EAxis::Y);
+
+		Value *= OmniControllerComponent->GetStrafeSpeedMod();
+	}
 
 	AddMovementInput(direction, Value);
 }
