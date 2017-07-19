@@ -2,6 +2,7 @@
 
 #include "OmniversePrivatePCH.h"
 #include "OmniControllerComponent.h"
+#include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
