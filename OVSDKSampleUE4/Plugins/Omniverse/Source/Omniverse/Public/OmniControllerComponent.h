@@ -37,26 +37,33 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float OmniYawOffset;			// Calibrated yaw between Omni-Device and Game-World coordination;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAutoCorrectStartYaw;		// Auto-correct harness to ACharacter's orientation on start;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin="0.0", UIMax="1.0"))
 	float BackwardMovementMod;		//With the CBM (Cadence Based Movement), the Backwards movement speed is very fast
-									//Set this value to slow down Backwards Movement. [0,1]
+						//Set this value to slow down Backwards Movement. [0,1]
+						
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (UIMin = "0.0", UIMax = "1.0"))
+	float StrafeSpeedMultiplier;
 
 	UFUNCTION(BlueprintCallable, Category = "OmniControllerComponent")
 	bool IsDeveloperMode() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "OmniControllerComponent")
-		float GetRawOmniYaw() { return RawOmniYaw; };
+	float GetRawOmniYaw() { return RawOmniYaw; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "OmniControllerComponent")
-		float GetAdjustedOmniYaw() { return OmniYaw; };
+	float GetAdjustedOmniYaw() { return AdjustedOmniYaw; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "OmniControllerComponent")
-		float GetCurrentMovementYaw() { return CurrYaw; };
+	float GetCurrentMovementYaw() { return CurrYaw; };
 
 	FRotator GetCurrentMovementDirection() { return MovementDirection; };
+
+	float GetBackwardMovementMod() { return BackwardMovementMultiplier; };
+
+	float GetStrafeSpeedMod() { return StrafeSpeedMultiplier; };
 
 protected:
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -68,6 +75,7 @@ protected:
 protected:
 	float RawOmniYaw;				// Harness Yaw in Omni-Device coordination;	
 	float OmniYaw;					// Harness Yaw in Game-world coordination;
+	float AdjustedOmniYaw;				// OmniYaw + the Character's Yaw
 
 	bool bStartYawCorrected;
 	float StartYawDiff;				// Yaw difference between PlayerStart and harness;
