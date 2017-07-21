@@ -125,7 +125,7 @@ public class OmniMovementComponent : MonoBehaviour {
 
     void Start()
     {
-        Debug.Log(System.DateTime.Now.ToLongTimeString() + ": OmniMovementComponent- Omniverse SDK Version 2.0.02");
+        Debug.Log(System.DateTime.Now.ToLongTimeString() + ": OmniMovementComponent- Omniverse SDK Version 2.0.04");
 
         OmniInitialize();
 
@@ -165,8 +165,10 @@ public class OmniMovementComponent : MonoBehaviour {
         angleBetweenControllerAndCamera = angleBetweenControllerAndCamera > 180 ? 360 - angleBetweenControllerAndCamera : angleBetweenControllerAndCamera;
 
         //calculate sign
-        float sign = (cameraYaw - adjustedOmniYaw >= 0 && cameraYaw - adjustedOmniYaw <= 180) ||
-            (cameraYaw - adjustedOmniYaw <= -180 && cameraYaw - adjustedOmniYaw >= -360) ? 1 : -1;
+        float angleForSignCalculation = (cameraYaw - adjustedOmniYaw) % 360;
+
+        float sign = (angleForSignCalculation >= 0 && angleForSignCalculation <= 180) ||
+            (angleForSignCalculation <= -180 && angleForSignCalculation >= -360) ? 1 : -1;
 
         angleBetweenControllerAndCamera *= sign;
 
