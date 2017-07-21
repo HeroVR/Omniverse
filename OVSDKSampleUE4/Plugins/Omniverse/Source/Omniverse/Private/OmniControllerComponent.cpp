@@ -97,8 +97,10 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 
 				AngleBetweenCameraAndOmni = AngleBetweenCameraAndOmni > 180 ? 360 - AngleBetweenCameraAndOmni : AngleBetweenCameraAndOmni;
 
-				float sign = ((cameraYaw - AdjustedOmniYaw) >= 0 && (cameraYaw - AdjustedOmniYaw <= 180)) ||
-					((cameraYaw - AdjustedOmniYaw) <= -180 && (cameraYaw - AdjustedOmniYaw) >= -360) ? 1 : -1;
+				float AngleForSignCalc = (int)(cameraYaw - AdjustedOmniYaw) % 360;
+
+				float sign = (AngleForSignCalc >= 0 && AngleForSignCalc <= 180) ||
+					(AngleForSignCalc <= -180 && AngleForSignCalc >= -360) ? 1 : -1;
 
 				AngleBetweenCameraAndOmni *= sign;
 
