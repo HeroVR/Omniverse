@@ -36,6 +36,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	float OmniYawOffset;			// Calibrated yaw between Omni-Device and Game-World coordination;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAutoCorrectStartYaw;		// Auto-correct harness to ACharacter's orientation on start;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin="0.0", UIMax="1.0"))
 	float BackwardMovementMultiplier;	//With the CBM (Cadence Based Movement), the Backwards movement speed is very fast
@@ -77,6 +80,7 @@ protected:
 	float AdjustedOmniYaw;				// OmniYaw + the Character's Yaw
 
 	float StartYawDiff;				// Yaw difference between PlayerStart and harness;
+	bool bStartYawCorrected;
 
 	float CurrYaw;					// Owner current orientation;
 	
