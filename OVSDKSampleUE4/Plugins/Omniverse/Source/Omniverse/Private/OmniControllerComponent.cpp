@@ -70,10 +70,6 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 					OmniYaw = RawOmniYaw - OmniYawOffset;
 				}
 
-				if (bAutoCorrectStartYaw && !bStartYawCorrected) {
-					bStartYawCorrected = true;
-					//StartYawDiff = pawn->GetActorRotation().Yaw - OmniYaw;	//difference between Vive and Game
-				}
 
 				float cameraYaw = Camera ? Camera->GetComponentTransform().Rotator().Yaw : 0;
 
@@ -82,15 +78,7 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 				//Calculating the Angle Between the Camera and the Omni
 
 				APlayerController *pc = CastChecked<APlayerController>(controller);
-				APawn* character = nullptr;
-				float CharacterRotation = 0.0f;
-
-				if (IsValid(pc))
-				{
-					APawn* character = pc->GetPawn();
-					if(IsValid(character))
-						CharacterRotation = character->GetActorTransform().Rotator().Yaw;
-				}
+				float CharacterRotation = pawn->GetActorTransform().Rotator().Yaw;
 
 				float AdjustedOmniYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation);
 				float AngleBetweenCameraAndOmni = (int)FMath::Abs(cameraYaw - AdjustedOmniYaw) % 360;
@@ -108,26 +96,21 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 
 				CurrYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation) + (AngleBetweenCameraAndOmni * CouplingPercentage);
 
-				if (!StartYawSet)
+				if (bAutoCorrectStartYaw && !StartYawSet)
 				{
-					APawn* character = pc->GetPawn();
+					// Only want to set this rotation once. Causes motion sickness if allowed to set on Tick.
 
-					if (IsValid(character))
-					{
-						// Only want to set this rotation once. Causes motion sickness if allowed to set on Tick.
+					StartYawSet = true;
+					float CameraForwardYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation) + (AngleBetweenCameraAndOmni);
+					float CameraOffsetFromCharacter = pawn->GetActorTransform().Rotator().Yaw - CameraForwardYaw;
 
-						StartYawSet = true;
-						float CameraForwardYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation) + (AngleBetweenCameraAndOmni);
-						float CameraOffsetFromCharacter = character->GetActorTransform().Rotator().Yaw - CameraForwardYaw;
+					FRotator CameraOffsetRotator = FRotator(ForceInit);
+					CameraOffsetRotator.Yaw = CameraOffsetFromCharacter;
 
-						FRotator CameraOffsetRotator = FRotator(ForceInit);
-						CameraOffsetRotator.Yaw = CameraOffsetFromCharacter;
+					FRotator newRotation = FRotator(0.0f, 0.0f, 0.0f);
+					newRotation = UKismetMathLibrary::ComposeRotators(CameraOffsetRotator, pc->GetControlRotation());
 
-						FRotator newRotation = FRotator(0.0f, 0.0f, 0.0f);
-						newRotation = UKismetMathLibrary::ComposeRotators(CameraOffsetRotator, pc->GetControlRotation());
-
-						pc->SetControlRotation(newRotation);
-					}
+					pc->SetControlRotation(newRotation);
 				}
 
 				MovementDirection = FRotator(0.0f, CurrYaw, 0.0f);
@@ -167,4 +150,34 @@ bool UOmniControllerComponent::IsDeveloperMode() const
 #else
 	return false;
 #endif
+}
+
+void UOmniControllerComponent::AutoUpdateCharacterDirection()
+{
+	APawn *pawn = Cast<APawn>(GetOwner());
+	if (pawn && Camera)
+	{
+		AController *controller = pawn->GetController();
+		if (controller && controller->IsLocalPlayerController())
+		{
+			if (!IsDeveloperMode())
+			{
+				if (bAutoCorrectStartYaw && !bStartYawCorrected) {
+					bStartYawCorrected = true;
+					StartYawDiff = pawn->GetActorRotation().Yaw - OmniYaw;	//difference between Vive and Game
+				}
+
+				float cameraYaw = Camera ? Camera->GetComponentTransform().Rotator().Yaw : 0;
+				float characterYaw = cameraYaw * CouplingPercentage + (OmniYaw + StartYawDiff) * (1.0f - CouplingPercentage);
+
+				// Set ACharacter Yaw
+				APlayerController *pc = CastChecked<APlayerController>(controller);
+				pc->SetControlRotation(FRotator(pc->RotationInput.Pitch, characterYaw, pc->RotationInput.Roll));
+
+				if (Camera != nullptr) {
+					Camera->GetAttachParent()->SetRelativeRotation(FQuat(FRotator(0, -pawn->GetActorRotation().Yaw + StartYawDiff, 0)));
+				}
+			}
+		}
+	}
 }

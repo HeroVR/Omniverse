@@ -19,7 +19,7 @@
       "h": "40",
       "type": "Text",
       "style": "",
-      "cmd": "1|<size=14><color=#FFFFFF>Game time left: </color><color=#00FFFF>{0} sec.</color></size>"
+      "cmd": "1|<size=14><color=#FFFFFF>Game time left: </color><color=#00FFFF><@nGameDurationLeft_min@>:<@nGameDurationLeft_sec@></color></size>"
     },
     {
       "x": "0",

@@ -37,7 +37,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float OmniYawOffset;			// Calibrated yaw between Omni-Device and Game-World coordination;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAutoCorrectStartYaw;		// Auto-correct harness to ACharacter's orientation on start;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin="0.0", UIMax="1.0"))
@@ -65,12 +65,14 @@ public:
 
 	float GetStrafeSpeedMod() { return StrafeSpeedMultiplier; };
 
+	UFUNCTION(BlueprintCallable, Category = "OmniControllerComponent")
+	void AutoUpdateCharacterDirection();
+
 protected:
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TEnumAsByte<EOmniState::Type> OmniState;
 
 	void CheckOmniState();
-
 
 protected:
 	float RawOmniYaw;				// Harness Yaw in Omni-Device coordination;	

@@ -10,6 +10,8 @@
 #include "MotionControllerComponent.h"
 #include "OVInterface.h"
 
+#define OMNI_ROTATE_CHARACTER_MESH 1
+
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,6 +76,10 @@ void AOVSDKSampleUE4Character::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	FirstPersonCameraComponent->bUsePawnControlRotation = !UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled();
+
+#ifndef OMNI_ROTATE_CHARACTER_MESH
+	OmniControllerComponent->AutoUpdateCharacterDirection();
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -146,20 +152,24 @@ void AOVSDKSampleUE4Character::MoveForward(float Value)
 		return;
 	
 	bool OmniFound = false;
+	UOmniControllerPluginFunctionLibrary::IsOmniFound(OmniFound);
+
+	if (OmniFound && Value < 0) {
+		Value *= OmniControllerComponent->GetBackwardMovementMod();
+	}
+
+#ifdef OMNI_ROTATE_CHARACTER_MESH
 	FRotator rotation(ForceInit);
 	rotation.Yaw = FirstPersonCameraComponent->ComponentToWorld.GetRotation().Rotator().Yaw;
 	FVector direction = rotation.Vector();
 	
-	UOmniControllerPluginFunctionLibrary::IsOmniFound(OmniFound);
-	
-	if(OmniFound)
-	{
-		if(Value < 0)
-			Value *= OmniControllerComponent->GetBackwardMovementMod();
-		
+	if (OmniFound)	{
 		direction = FRotationMatrix(OmniControllerComponent->GetCurrentMovementDirection()).GetScaledAxis(EAxis::X);
 	}
-	AddMovementInput(direction, Value);			
+#else
+	FVector direction = GetActorForwardVector();
+#endif
+	AddMovementInput(direction, Value);
 }
 
 void AOVSDKSampleUE4Character::MoveRight(float Value)
@@ -168,16 +178,20 @@ void AOVSDKSampleUE4Character::MoveRight(float Value)
 		return;
 
 	bool OmniFound = false;
-	FVector direction = FirstPersonCameraComponent->GetRightVector();
-
 	UOmniControllerPluginFunctionLibrary::IsOmniFound(OmniFound);
 
-	if (OmniFound)
-	{
-		direction = FRotationMatrix(OmniControllerComponent->GetCurrentMovementDirection()).GetScaledAxis(EAxis::Y);
-
+	if (OmniFound) {
 		Value *= OmniControllerComponent->GetStrafeSpeedMod();
 	}
+
+#if OMNI_ROTATE_CHARACTER_MESH
+	FVector direction = FirstPersonCameraComponent->GetRightVector();
+	if (OmniFound)	{
+		direction = FRotationMatrix(OmniControllerComponent->GetCurrentMovementDirection()).GetScaledAxis(EAxis::Y);
+	}
+#else
+	FVector direction = GetActorRightVector();
+#endif
 
 	AddMovementInput(direction, Value);
 }

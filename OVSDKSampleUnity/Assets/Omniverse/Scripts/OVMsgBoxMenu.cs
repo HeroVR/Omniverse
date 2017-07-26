@@ -201,7 +201,7 @@ public class OVMsgBoxMenu : OVMsgBox
 				switch (type)
 				{
 					case 1:
-						content = string.Format("{0}", ui.nGameDurationLeft / 60);
+						content = string.Format("{0}", ui.nGameDurationLeft);
 						need_update = true;
 						break;
 					case 2:

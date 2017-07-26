@@ -20,7 +20,7 @@
       "h": "40",
       "type": "Text",
       "style": "",
-      "cmd": "1|Game time left: {0} sec."
+      "cmd": "1|Game time left: <@nGameDurationLeft_min@>:<@nGameDurationLeft_sec@>."
     },
     {
       "x": "100",
