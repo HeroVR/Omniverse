@@ -281,7 +281,7 @@ float UOVInterface::GetOmniCoupleRate()
 	if (funcGetOmniCoupleRate) {
 		return funcGetOmniCoupleRate();
 	}
-	return 0;
+	return 1;
 }
 
 uint32 UOVInterface::GetUserOmniCoupleRate()
@@ -289,7 +289,7 @@ uint32 UOVInterface::GetUserOmniCoupleRate()
 	if (funcGetUserOmniCoupleRate) {
 		return funcGetUserOmniCoupleRate();
 	}
-	return 0;
+	return 1;
 }
 
 void UOVInterface::SetOmniCoupleRate(float coupleRate) 
