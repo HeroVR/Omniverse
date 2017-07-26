@@ -80,7 +80,7 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 				APlayerController *pc = CastChecked<APlayerController>(controller);
 				float CharacterRotation = pawn->GetActorTransform().Rotator().Yaw;
 
-				float AdjustedOmniYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation);
+				AdjustedOmniYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation);
 				float AngleBetweenCameraAndOmni = (int)FMath::Abs(cameraYaw - AdjustedOmniYaw) % 360;
 
 				AngleBetweenCameraAndOmni = AngleBetweenCameraAndOmni > 180 ? 360 - AngleBetweenCameraAndOmni : AngleBetweenCameraAndOmni;
