@@ -16,6 +16,8 @@ UOmniControllerComponent::UOmniControllerComponent()
 
 	bForceDeveloperMode = false;
 
+	bAutoCorrectStartYaw = true;
+	bStartYawCorrected = false;
 	StartYawSet = false;
 	StartYawDiff = 0;
 	BackwardMovementMultiplier = 0.40f;
