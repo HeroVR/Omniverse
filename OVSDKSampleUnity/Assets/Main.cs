@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Runtime.InteropServices;
 using System.IO;
 using System;
+using UnityEngine.SceneManagement;
 
 public class Main : MonoBehaviour {
 
@@ -33,8 +34,21 @@ public class Main : MonoBehaviour {
             OnOVSDKInit();
         }
 	}
+    public void ChangeSenceTest()
+    {
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            AsyncOperation async = SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
+            async.allowSceneActivation = true;
+        }
+        else
+        {
+            AsyncOperation async = SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
+            async.allowSceneActivation = true;
+        }
 
-	void OnOVSDKInit()
+    }
+    void OnOVSDKInit()
     {
         Debug.Log("OnOVSDKInit: " + OVSDK.GetInitResult());
 

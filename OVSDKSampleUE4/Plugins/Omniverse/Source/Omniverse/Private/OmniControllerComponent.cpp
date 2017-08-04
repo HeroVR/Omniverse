@@ -167,8 +167,15 @@ void UOmniControllerComponent::AutoUpdateCharacterDirection()
 					StartYawDiff = pawn->GetActorRotation().Yaw - OmniYaw;	//difference between Vive and Game
 				}
 
-				float cameraYaw = Camera ? Camera->GetComponentTransform().Rotator().Yaw : 0;
-				float characterYaw = cameraYaw * CouplingPercentage + (OmniYaw + StartYawDiff) * (1.0f - CouplingPercentage);
+				float cameraYaw = Camera ? Camera->RelativeRotation.Yaw : 0;
+				float diff = FMath::Fmod(cameraYaw - OmniYaw, 360.0f);
+				if (diff > 180.0f) {
+					diff -= 360;
+				}
+				else if (diff < -180.0f) {
+					diff += 360;
+				}
+				float characterYaw = StartYawDiff + OmniYaw + diff * CouplingPercentage ;
 
 				// Set ACharacter Yaw
 				APlayerController *pc = CastChecked<APlayerController>(controller);
