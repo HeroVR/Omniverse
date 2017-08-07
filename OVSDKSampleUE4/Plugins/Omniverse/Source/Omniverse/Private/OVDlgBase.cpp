@@ -25,8 +25,8 @@ AOVDlgBase::AOVDlgBase(const FObjectInitializer& ObjectInitializer)
 	WidgetComponent->SetRelativeRotation(FRotator(0.0f, -180, 0.0f));
 	WidgetComponent->SetupAttachment(RootComponent);
 	WidgetComponent->ComponentTags.Add(TEXT("OVSDK"));
-	static ConstructorHelpers::FObjectFinderOptional<UMaterial> material(TEXT("/Engine/EngineMaterials/Widget3DPassThrough.Widget3DPassThrough"));
-	WidgetComponent->SetMaterial(0, material.Get());
+	static ConstructorHelpers::FObjectFinder<UMaterial> material(TEXT("/Engine/EngineMaterials/Widget3DPassThrough.Widget3DPassThrough"));
+	WidgetComponent->SetMaterial(0, material.Object);
 	WidgetComponent->SetDrawAtDesiredSize(true);
 	
 	SetTickGroup(ETickingGroup::TG_LastDemotable);

@@ -178,8 +178,10 @@ void UOmniControllerComponent::AutoUpdateCharacterDirection()
 				float characterYaw = StartYawDiff + OmniYaw + diff * CouplingPercentage ;
 
 				// Set ACharacter Yaw
-				APlayerController *pc = CastChecked<APlayerController>(controller);
-				pc->SetControlRotation(FRotator(pc->RotationInput.Pitch, characterYaw, pc->RotationInput.Roll));
+				//APlayerController *pc = CastChecked<APlayerController>(controller);
+				//pc->SetControlRotation(FRotator(pc->RotationInput.Pitch, characterYaw, pc->RotationInput.Roll));
+				FRotator charRot = pawn->GetActorRotation();
+				pawn->SetActorRotation(FRotator(charRot.Pitch, characterYaw, charRot.Roll));
 
 				if (Camera != nullptr) {
 					Camera->GetAttachParent()->SetRelativeRotation(FQuat(FRotator(0, -pawn->GetActorRotation().Yaw + StartYawDiff, 0)));

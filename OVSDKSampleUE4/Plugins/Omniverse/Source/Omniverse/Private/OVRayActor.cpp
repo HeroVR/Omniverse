@@ -15,7 +15,7 @@ AOVRayActor::AOVRayActor()
 	PrimaryActorTick.bCanEverTick = true;
 	bVisible = false;
 
-	static ConstructorHelpers::FObjectFinderOptional<UMaterial> material(TEXT("/Omniverse/OVSDK/LineMaterial.LineMaterial"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> material(TEXT("/Omniverse/OVSDK/LineMaterial.LineMaterial"));
 	if (!HasAnyFlags(RF_ClassDefaultObject))
 	{
 		//left controller
@@ -41,7 +41,7 @@ AOVRayActor::AOVRayActor()
 
 		//left ray
 		CustomMesh = CreateDefaultSubobject<UCustomMeshComponent>(TEXT("CustemMesh"));
-		CustomMesh->SetMaterial(0, material.Get());
+		CustomMesh->SetMaterial(0, material.Object);
 		CustomMesh->SetupAttachment(WidgetInteraction);
 		CustomMesh->SetTranslucentSortPriority(255);
 	}
