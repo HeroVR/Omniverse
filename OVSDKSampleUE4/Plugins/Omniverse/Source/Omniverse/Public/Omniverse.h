@@ -4,6 +4,7 @@
 
 #include "ModuleManager.h"
 #include "IInputDeviceModule.h"
+#include "Runtime/Slate/Public/Framework/Application/SlateApplication.h"
 #include "WindowsApplication.h"
 //#include "OmniInputDevice.h"
 
@@ -44,6 +45,14 @@ public:
 	static inline bool IsAvailable()
 	{
 		return FModuleManager::Get().IsModuleLoaded("Omniverse");
+	}
+
+	FWindowsApplication* GetApplication() const
+	{
+		if (!FSlateApplication::IsInitialized())
+			return nullptr;
+
+		return (FWindowsApplication*)FSlateApplication::Get().GetPlatformApplication().Get();
 	}
 
 private:
