@@ -60,6 +60,12 @@ void FOmniverseModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
+
+	FWindowsApplication* App = GetApplication();
+
+	if (App)
+		App->RemoveMessageHandler(Handler);
+
 }
 
 void FOmniverseModule::PostLoadCallback()
@@ -76,6 +82,12 @@ void FOmniverseModule::PreUnloadCallback()
 TSharedPtr<class IInputDevice> FOmniverseModule::CreateInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Creating new Omni input Device"));
+
+	FWindowsApplication* App = GetApplication();
+
+	if (App)
+		App->AddMessageHandler(Handler);
+
 	OmniInputDevice = MakeShareable(new FOmniInputDevice(InMessageHandler));
 	return TSharedPtr< class IInputDevice >(OmniInputDevice);
 
