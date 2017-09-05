@@ -59,6 +59,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "OmniControllerComponent")
 	float GetCurrentMovementYaw() { return CurrYaw; };
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "OmniControllerComponent")
 	FRotator GetCurrentMovementDirection() { return MovementDirection; };
 
 	float GetBackwardMovementMod() { return BackwardMovementMultiplier; };
