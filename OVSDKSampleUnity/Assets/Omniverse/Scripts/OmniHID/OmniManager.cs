@@ -70,7 +70,10 @@ public class OmniManager
     public void Cleanup()
     {
         if (hidapi_handle != IntPtr.Zero)
+		{
             HIDapi.hid_close(hidapi_handle);
+			hidapi_handle = IntPtr.Zero;
+		}            
     }
 
     public int ReadData(ref byte[] packet) 

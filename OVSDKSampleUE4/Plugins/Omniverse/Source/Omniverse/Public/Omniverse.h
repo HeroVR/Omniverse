@@ -32,7 +32,7 @@ public:
 	virtual void PreUnloadCallback() override;
 	virtual void ShutdownModule() override;
 
-	virtual TSharedPtr< class IInputDevice > FOmniverseModule::CreateInputDevice(const TSharedRef< FGenericApplicationMessageHandler >& InMessageHandler) override;
+	virtual TSharedPtr< class IInputDevice > CreateInputDevice(const TSharedRef< FGenericApplicationMessageHandler >& InMessageHandler) override;
 
 	TSharedPtr< class FOmniInputDevice > OmniInputDevice;
 
