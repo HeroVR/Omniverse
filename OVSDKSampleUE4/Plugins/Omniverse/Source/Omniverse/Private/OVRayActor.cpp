@@ -6,6 +6,9 @@
 #include <Runtime/HeadMountedDisplay/Public/MotionControllerComponent.h>
 #include <Runtime/UMG/Public/Components/WidgetInteractionComponent.h>
 #include "CustomMeshComponent.h"
+#if UE_VERSION_GE(4, 17)
+#include <Kismet/HeadMountedDisplayFunctionLibrary.h>
+#endif
 
 AOVRayActor::AOVRayActor()
 {
