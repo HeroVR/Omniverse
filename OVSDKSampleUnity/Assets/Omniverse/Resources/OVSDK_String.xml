@@ -8,17 +8,17 @@
 	<r id="Cancel" str="Cancel"/>
 	<r id="Bye" str="Bye！"/>
 	<r id="Purchase" str="Purchase"/>
-	<r id="PurchaseGuest" str="Can't do purchase as a guest."/>
-	<r id="PurchaseSuccess" str="Purchase success! OrderNo.&#13;&lt;color=#00FF00&gt;{0}&lt;/color&gt;"/>
+	<r id="PurchaseGuest" str="Hi Omni player! An Omniverse user account is required to make a purchase."/>
+	<r id="PurchaseSuccess" str="Successfully completed purchase! OrderNo.&#13;&lt;color=#00FF00&gt;{0}&lt;/color&gt;"/>
 	<r id="PurchaseFailed" str="Purchase failed! &#13;&lt;color=#FF0000&gt;({0})&lt;/color&gt;"/>
-	<r id="PurchaseConnectFailed" str="Purchase failed,&#13;Error occured when connect server!&#13;&lt;color=#FF0000&gt;({0})&lt;/color&gt;"/>
+	<r id="PurchaseConnectFailed" str="Purchase failed,&#13;Error occured when attempting to connect to the server!&#13;&lt;color=#FF0000&gt;({0})&lt;/color&gt;"/>
 	<r id="PurchaseConfirm" str="Purchasing [&lt;color=#00FF00&gt;{0}&lt;/color&gt;],&#13;Cost: &#13;&lt;color=#00FF00&gt;{1}&lt;/color&gt;,&#13;&#13;Are you sure?"/>
-	<r id="Resume" str="Resume Game"/>
-	<r id="ResumeError" str="No points, no same-game tickets, Bye!"/>
-	<r id="ResumeConfirm" str="Your points: &lt;color=#00FF00&gt;{0}&lt;/color&gt;&#13;Same-game tickets: &lt;color=#00FF00&gt;{1}&lt;/color&gt;&#13;Resume game will cost same-game tickets, otherwise cost points."/>
-	<r id="ResumeYes" str="Resume"/>
+	<r id="Resume" str="Continue Playing"/>
+	<r id="ResumeError" str="Your balance is insufficient. Cannot continue playing. Goodbye!"/>
+	<r id="ResumeConfirm" str="Your credits: &lt;color=#00FF00&gt;{0}&lt;/color&gt;&#13;Same-game tickets: &lt;color=#00FF00&gt;{1}&lt;/color&gt;&#13;Contiune playing will cost same-game tickets, otherwise it will cost credits."/>
+	<r id="ResumeYes" str="Continue"/>
 	<r id="ResumeNo" str="Quit!"/>
-	<r id="ResumeSuccess" str="Resume success!"/>
-	<r id="ResumeFailed" str="Resume failed!&#13;&lt;color=#FF0000&gt;（{0}）&lt;/color&gt;"/>
-	<r id="SaveGameGuest" str="Can't save game for a guest."/>
+	<r id="ResumeSuccess" str="Successfully continued!"/>
+	<r id="ResumeFailed" str="Failed to continue!&#13;&lt;color=#FF0000&gt;（{0}）&lt;/color&gt;"/>
+	<r id="SaveGameGuest" str="Hi Omni player! An Omniverse user account is required to save and load games.”/>
 </root>
