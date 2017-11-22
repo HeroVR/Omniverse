@@ -96,22 +96,22 @@ void UOmniControllerComponent::TickComponent( float DeltaTime, ELevelTick TickTy
 
 				CurrYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation) + (AngleBetweenCameraAndOmni * CouplingPercentage);
 
-				if (bAutoCorrectStartYaw && !StartYawSet)
-				{
-					// Only want to set this rotation once. Causes motion sickness if allowed to set on Tick.
-
-					StartYawSet = true;
-					float CameraForwardYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation) + (AngleBetweenCameraAndOmni);
-					float CameraOffsetFromCharacter = pawn->GetActorTransform().Rotator().Yaw - CameraForwardYaw;
-
-					FRotator CameraOffsetRotator = FRotator(ForceInit);
-					CameraOffsetRotator.Yaw = CameraOffsetFromCharacter;
-
-					FRotator newRotation = FRotator(0.0f, 0.0f, 0.0f);
-					newRotation = UKismetMathLibrary::ComposeRotators(CameraOffsetRotator, pc->GetControlRotation());
-
-					pc->SetControlRotation(newRotation);
-				}
+				//if (bAutoCorrectStartYaw && !StartYawSet)
+				//{
+				//	// Only want to set this rotation once. Causes motion sickness if allowed to set on Tick.
+				//
+				//	StartYawSet = true;
+				//	float CameraForwardYaw = (RawOmniYaw - OmniYawOffset + CharacterRotation) + (AngleBetweenCameraAndOmni);
+				//	float CameraOffsetFromCharacter = pawn->GetActorTransform().Rotator().Yaw - CameraForwardYaw;
+				//
+				//	FRotator CameraOffsetRotator = FRotator(ForceInit);
+				//	CameraOffsetRotator.Yaw = CameraOffsetFromCharacter;
+				//
+				//	FRotator newRotation = FRotator(0.0f, 0.0f, 0.0f);
+				//	newRotation = UKismetMathLibrary::ComposeRotators(CameraOffsetRotator, pc->GetControlRotation());
+				//
+				//	//pc->SetControlRotation(newRotation);
+				//}
 
 				MovementDirection = FRotator(0.0f, CurrYaw, 0.0f);
 			}				
