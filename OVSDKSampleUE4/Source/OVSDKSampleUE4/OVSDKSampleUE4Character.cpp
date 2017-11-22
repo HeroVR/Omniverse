@@ -45,6 +45,8 @@ AOVSDKSampleUE4Character::AOVSDKSampleUE4Character()
 	// Create OmniControllerComponent
 	OmniControllerComponent = CreateDefaultSubobject<UOmniControllerComponent>(TEXT("OmniControllerComponent"));
 	OmniControllerComponent->InitOmniDone.AddDynamic(this, &AOVSDKSampleUE4Character::OnInitOmniDone);
+	
+	CorrectForwardSet = false;
 }
 
 
