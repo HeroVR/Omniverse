@@ -1,5 +1,7 @@
 #pragma once
 #include "OmniversePrivatePCH.h"
+#include "OVDebugLogs.h"
+
 #include "hidapi.h"
 
 
@@ -118,4 +120,7 @@ private:
 
 	FTicker Ticker;
 
+	OVDebug DebugFileRef;
+	FString CommandLineArgs;
+	bool PrintLogFile = false;
 };

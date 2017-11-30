@@ -23,6 +23,12 @@ FOmniInputDevice::FOmniInputDevice(const TSharedRef<FGenericApplicationMessageHa
 	NumFailedPackagesBeforeReconnect = 10;
 	tickerAdded = false;
 	tickerLoops = 0;
+	CommandLineArgs = FCommandLine::Get();
+
+	PrintLogFile = DebugFileRef.ParseCommandLineForDebug(CommandLineArgs);
+
+	if(PrintLogFile)
+		DebugFileRef.InitializeDebugFile();
 
 	AttemptToReconnectTheOmni_Handle = FDelegateHandle::FDelegateHandle();
 
@@ -70,6 +76,10 @@ void FOmniInputDevice::Init(bool StartUpCall)
 	if (devs == NULL)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No HID Devices detected."));
+
+		if (PrintLogFile)
+			DebugFileRef.AddToFile("\n\rNo HID Devices detected.");
+
 		hid_exit();
 		tryingToReconnectOmni = false;
 		if (!tickerAdded)
@@ -127,12 +137,20 @@ void FOmniInputDevice::Init(bool StartUpCall)
 		tickerLoops = 0;
 		UE_LOG(LogTemp, Warning, TEXT("Omni Found"));
 
+		if (PrintLogFile)
+			DebugFileRef.AddToFile("\n\rOmni Found.");
+
+
 		if (StartUpCall && !tickerAdded)
 			AttemptToReconnectTheOmni_Handle = Ticker.GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &FOmniInputDevice::AttemptToReconnect), 0.5f);
 
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Omni Not Found"));
+
+		if (PrintLogFile)
+			DebugFileRef.AddToFile("\n\rOmni Not Found.");
+
 		tryingToReconnectOmni = false;
 
 		if (!tickerAdded)
@@ -167,6 +185,10 @@ void FOmniInputDevice::SendControllerEvents()
 		MessageHandler->OnControllerAnalog("OmniYAxis", 0, YAxis);
 
 		UE_LOG(LogTemp, Warning, TEXT("Input zeroed out. Omni not connected."));
+
+		if (PrintLogFile)
+			DebugFileRef.AddToFile("\n\rInput zeroed out. Omni not connected.");
+
 		return;
 	}
 
@@ -176,6 +198,13 @@ void FOmniInputDevice::SendControllerEvents()
 	{
 		failedPackagesNum++;
 		UE_LOG(LogTemp, Warning, TEXT("Number of Failed Omni Packages: %i"), failedPackagesNum);
+
+		if (PrintLogFile)
+		{ 	
+			FString text = "\n\rNumber of Failed Omni Packages: ";
+			text.AppendInt(failedPackagesNum);
+			DebugFileRef.AddToFile(text);
+		}
 
 		MessageHandler->OnControllerAnalog("OmniYaw", 0, OmniYaw);
 		MessageHandler->OnControllerAnalog("OmniXAxis", 0, XAxis);
@@ -192,6 +221,10 @@ void FOmniInputDevice::SendControllerEvents()
 		}
 
 		UE_LOG(LogTemp, Error, TEXT("Omni is NOT receiving Input! Please make sure the Omni is connected and powered on!"));
+		
+		if (PrintLogFile)
+			DebugFileRef.AddToFile("\n\rOmni is NOT receiving Input! Please make sure the Omni is connected and powered on!");
+
 		return;
 	}
 
@@ -200,6 +233,9 @@ void FOmniInputDevice::SendControllerEvents()
 	if((OmniInputBuffer[0] != 0xEF && !OmniDisconnected) || (!OmniDisconnected && OmniInputBuffer[2] != 0xA9))	//Checking for Invalid Message
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to Read HID Data."));
+		
+		if (PrintLogFile)
+			DebugFileRef.AddToFile("\n\rFailed to Read HID Data.");
 
 		MessageHandler->OnControllerAnalog("OmniYaw", 0, OmniYaw);
 		MessageHandler->OnControllerAnalog("OmniXAxis", 0, XAxis);
