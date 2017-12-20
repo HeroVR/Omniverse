@@ -15,8 +15,6 @@ int32 failedPackagesNum = 0;
 
 FOmniInputDevice::FOmniInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler) : MessageHandler(InMessageHandler)
 {
-	UE_LOG(LogTemp, Warning, TEXT("----------Current SDK Version - v2.0.4----------"));
-
 	OmniHandle = nullptr;
 	OmniDisconnected = true;
 	tryingToReconnectOmni = false;
