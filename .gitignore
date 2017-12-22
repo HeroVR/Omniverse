@@ -1,3 +1,6 @@
 ﻿/OVSDKSampleUnity/Temp
 *.opendb
 *.VC.db
+/OVSDKSampleUnity/Library
+/OVSDKSampleUnity/.vs
+
