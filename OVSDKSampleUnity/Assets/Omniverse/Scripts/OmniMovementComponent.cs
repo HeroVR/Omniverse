@@ -125,7 +125,7 @@ public class OmniMovementComponent : MonoBehaviour {
 
     void Start()
     {
-        Debug.Log(System.DateTime.Now.ToLongTimeString() + ": OmniMovementComponent- Omniverse SDK Version 2.1.1");
+        Debug.Log(System.DateTime.Now.ToLongTimeString() + ": OmniMovementComponent- Omniverse SDK Version 2.2.1");
 
         if (!Application.isEditor)
         {
